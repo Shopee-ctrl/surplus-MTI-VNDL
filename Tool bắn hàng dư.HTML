@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTL SYSTEM - Quản Lý Kiểm Kê</title>
+
+    <style>
+        :root {
+            --bg-main: #0d131d;
+            --bg-card: #151d2a;
+            --bg-input: #1c2638;
+            --border: #27354a;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --cyan: #00d2ff;
+            --green: #10b981;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        header {
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        header h1 {
+            color: var(--cyan);
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .status {
+            color: var(--green);
+            font-size: 0.7rem;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            height: calc(100vh - 53px);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: var(--cyan);
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+
+        .card-title-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .counter {
+            color: var(--muted);
+            font-size: 0.68rem;
+            white-space: nowrap;
+        }
+
+        .zone-1 {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .zone-2 {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .zone-3 {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .zone-4 {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex: 1;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .full {
+            grid-column: span 2;
+        }
+
+        label {
+            color: var(--muted);
+            font-size: 0.64rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 7px 8px;
+            background: var(--bg-input);
+            color: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            outline: none;
+            font-size: 0.8rem;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--cyan);
+        }
+
+        input[type="date"] {
+            color-scheme: dark;
+        }
+
+        .sku-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 6px;
+        }
+
+        .sku-row input:first-child {
+            border-color: var(--cyan);
+        }
+
+        .sku-row input:last-child {
+            border-color: var(--green);
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .condition-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .condition {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-input);
+            cursor: pointer;
+        }
+
+        .condition input {
+            width: 16px;
+            height: 16px;
+        }
+
+        .condition span {
+            font-size: 0.72rem;
+            font-weight: bold;
+        }
+
+        .good {
+            color: var(--green);
+        }
+
+        .damage {
+            color: var(--red);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .main-button {
+            flex: 1;
+            padding: 9px 4px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.72rem;
+            font-weight: bold;
+        }
+
+        .main-button:hover,
+        .reload:hover,
+        .delete:hover {
+            opacity: 0.8;
+        }
+
+        .query {
+            background: var(--cyan);
+            color: #000;
+        }
+
+        .save {
+            background: var(--green);
+            color: #000;
+        }
+
+        .reload {
+            padding: 4px 8px;
+            background: var(--bg-input);
+            color: var(--cyan);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+
+        .info-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-input);
+            border: 1px dashed var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            overflow: auto;
+        }
+
+        .placeholder {
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+
+        .sku-info {
+            width: 100%;
+        }
+
+        .recent-sku-name {
+            color: var(--cyan);
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .detail-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.78rem;
+        }
+
+        .detail-line span:first-child {
+            color: var(--muted);
+        }
+
+        .inventory-box {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+            border: 1px dashed var(--border);
+            border-radius: 4px;
+            padding: 5px;
+        }
+
+        .message {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--muted);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .error-message {
+            color: var(--red);
+        }
+
+        .table-box {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            padding: 7px 6px;
+            background: var(--bg-input);
+            color: var(--muted);
+            font-size: 0.68rem;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 7px 6px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tr:hover td {
+            background: rgba(0, 210, 255, 0.06);
+        }
+
+        .qty {
+            color: var(--green);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .tag-good {
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        .tag-damage {
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        .delete {
+            background: transparent;
+            border: none;
+            color: var(--red);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .lookup-table {
+            min-width: 780px;
+        }
+
+        .queue-table {
+            min-width: 650px;
+        }
+
+        .lookup-qty {
+            color: var(--green);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .sku-name-cell {
+            width: 180px;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                overflow: auto;
+            }
+
+            .app {
+                display: flex;
+                flex-direction: column;
+                height: auto;
+            }
+
+            .card {
+                min-height: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>MTL SYSTEM</h1>
+    <div class="status">● GOOGLE SHEETS</div>
+</header>
+
+<main class="app">
+
+    <!-- KHU VỰC 1 -->
+    <section class="card zone-1">
+
+        <div class="card-title">
+            <span>1. Nhập Dữ Liệu</span>
+        </div>
+
+        <form id="scanForm" class="form">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="inboundDate">Inbound Date</label>
+                    <input type="date" id="inboundDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="warehouse">Warehouse</label>
+                    <select id="warehouse">
+                        <option value="VNA">VNA</option>
+                        <option value="VNNL">VNNL</option>
+                        <option value="VNVL">VNVL</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="staff">Staff</label>
+                    <input type="text" id="staff" placeholder="Nhập tên">
+                </div>
+
+                <div class="form-group">
+                    <label for="palletNo">Pallet No.</label>
+                    <input type="text" id="palletNo" placeholder="Số pallet">
+                </div>
+
+                <div class="form-group full">
+
+                    <div class="sku-row">
+
+                        <div>
+                            <label for="inputSku" style="color: var(--cyan);">
+                                Input SKU ID
+                            </label>
+
+                            <input
+                                type="text"
+                                id="inputSku"
+                                placeholder="Bắn hoặc nhập SKU"
+                                autofocus>
+                        </div>
+
+                        <div>
+                            <label for="inputQty" style="color: var(--green);">
+                                Qty
+                            </label>
+
+                            <input
+                                type="number"
+                                id="inputQty"
+                                value="1"
+                                min="1">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="form-group full">
+
+                    <label>Condition</label>
+
+                    <div class="condition-row">
+
+                        <label class="condition">
+                            <input
+                                type="checkbox"
+                                id="chkGood"
+                                checked>
+
+                            <span class="good">
+                                GOOD - Hàng tốt
+                            </span>
+                        </label>
+
+                        <label class="condition">
+                            <input
+                                type="checkbox"
+                                id="chkDamage">
+
+                            <span class="damage">
+                                DAMAGE - Hàng lỗi
+                            </span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="main-button query">
+                    QUERY / ENTER
+                </button>
+
+                <button
+                    type="button"
+                    class="main-button save"
+                    id="saveButton">
+                    DONE / LƯU SHEET
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- KHU VỰC 2 -->
+    <section class="card zone-2">
+
+        <div class="card-title">
+            <span>2. Thông Tin SKU Vừa Bắn</span>
+        </div>
+
+        <div class="info-box">
+
+            <div
+                id="recentPlaceholder"
+                class="placeholder">
+                Chưa có thông tin SKU
+            </div>
+
+            <div
+                id="recentSkuInfo"
+                class="sku-info"
+                style="display: none;">
+
+                <div
+                    id="recentSkuId"
+                    class="recent-sku-name">
+                </div>
+
+                <div class="detail-line">
+                    <span>Tình trạng:</span>
+                    <strong id="recentCondition"></strong>
+                </div>
+
+                <div class="detail-line">
+                    <span>Số lượng:</span>
+                    <strong
+                        id="recentQty"
+                        class="good">
+                    </strong>
+                </div>
+
+                <div class="detail-line">
+                    <span>Kho:</span>
+                    <strong
+                        id="recentWarehouse"
+                        style="color: var(--yellow);">
+                    </strong>
+                </div>
+
+                <div class="detail-line">
+                    <span>Người nhập:</span>
+                    <strong id="recentStaff"></strong>
+                </div>
+
+                <div class="detail-line">
+                    <span>Pallet:</span>
+                    <strong
+                        id="recentPallet"
+                        style="color: var(--cyan);">
+                    </strong>
+                </div>
+
+                <div class="detail-line">
+                    <span>Ngày:</span>
+                    <span id="recentDate"></span>
+                </div>
+
+                <div class="detail-line">
+                    <span>Thời gian:</span>
+                    <span id="recentTime"></span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- KHU VỰC 3 -->
+    <section class="card zone-3">
+
+        <div class="card-title">
+
+            <span>3. Inventory Details</span>
+
+            <div class="card-title-right">
+
+                <span
+                    id="lookupCounter"
+                    class="counter">
+                    0 LOCATIONS
+                </span>
+
+                <button
+                    type="button"
+                    id="reloadLookupButton"
+                    class="reload">
+                    ↻ TẢI LẠI
+                </button>
+
+            </div>
+
+        </div>
+
+        <div
+            id="inventoryBox"
+            class="inventory-box">
+
+            <div class="message">
+                Scan SKU và nhấn ENTER để tra cứu
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- KHU VỰC 4 -->
+    <section class="card zone-4">
+
+        <div class="card-title">
+
+            <span>4. Queue - Danh Sách Đã Bắn</span>
+
+            <span
+                id="queueCounter"
+                class="counter">
+                0 SKU
+            </span>
+
+        </div>
+
+        <div class="table-box">
+
+            <table class="queue-table">
+
+                <thead>
+                    <tr>
+                        <th>SKU ID</th>
+                        <th>Condition</th>
+                        <th>Warehouse / Staff / Pallet</th>
+                        <th>Qty</th>
+                        <th>Xóa</th>
+                    </tr>
+                </thead>
+
+                <tbody id="queueBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script>
+const GOOGLE_SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbyqZGcVKG2BFQd9nG5Ps8cWJ7zhmOgHpaOuISaUD7zXMhaGB7bNCSm53h6u7Q0LNqmH/exec";
+
+let queueList = [];
+
+
+/* KHỞI TẠO */
+document.addEventListener("DOMContentLoaded", function () {
+    setToday();
+
+    const scanForm =
+        document.getElementById("scanForm");
+
+    const inputSku =
+        document.getElementById("inputSku");
+
+    const inputQty =
+        document.getElementById("inputQty");
+
+    /*
+     * Enter lần 2 tại Qty:
+     * - Tra cứu SKU
+     * - Thêm SKU vào Queue
+     */
+    scanForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const sku = inputSku.value.trim();
+
+        if (!sku) {
+            alert("Vui lòng nhập hoặc bắn mã SKU!");
+            inputSku.focus();
+            return;
+        }
+
+        lookupSkuInventory();
+        addToQueue();
+    });
+
+    /*
+     * Enter lần 1 tại ô SKU:
+     * - Không tra cứu
+     * - Không thêm Queue
+     * - Chuyển sang ô Qty
+     */
+    inputSku.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        event.preventDefault();
+
+        const sku = inputSku.value.trim();
+
+        if (!sku) {
+            alert("Vui lòng nhập hoặc bắn mã SKU!");
+            inputSku.focus();
+            return;
+        }
+
+        inputQty.focus();
+        inputQty.select();
+    });
+
+    /*
+     * Enter lần 2 tại ô Qty:
+     * Submit form
+     */
+    inputQty.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        event.preventDefault();
+        scanForm.requestSubmit();
+    });
+
+    document
+        .getElementById("saveButton")
+        .addEventListener("click", saveQueueToSheet);
+
+    document
+        .getElementById("reloadLookupButton")
+        .addEventListener("click", lookupSkuInventory);
+
+    document
+        .getElementById("chkGood")
+        .addEventListener("change", function () {
+            if (this.checked) {
+                document.getElementById("chkDamage").checked = false;
+            } else {
+                this.checked = true;
+            }
+        });
+
+    document
+        .getElementById("chkDamage")
+        .addEventListener("change", function () {
+            if (this.checked) {
+                document.getElementById("chkGood").checked = false;
+            } else {
+                this.checked = true;
+            }
+        });
+
+    renderQueue();
+    inputSku.focus();
+});
+
+
+/* ĐẶT NGÀY HIỆN TẠI */
+function setToday() {
+    const now = new Date();
+
+    const localDate = new Date(
+        now.getTime() -
+        now.getTimezoneOffset() * 60000
+    )
+        .toISOString()
+        .split("T")[0];
+
+    document.getElementById("inboundDate").value =
+        localDate;
+}
+
+
+/* LẤY CONDITION */
+function getCondition() {
+    return document
+        .getElementById("chkDamage")
+        .checked
+        ? "Damage"
+        : "Good";
+}
+
+
+/* THÊM SKU VÀO QUEUE */
+function addToQueue() {
+    const skuId = document
+        .getElementById("inputSku")
+        .value
+        .trim();
+
+    const qty = Number(
+        document
+            .getElementById("inputQty")
+            .value
+    ) || 1;
+
+    const date = document
+        .getElementById("inboundDate")
+        .value;
+
+    const warehouse = document
+        .getElementById("warehouse")
+        .value;
+
+    const staff = document
+        .getElementById("staff")
+        .value
+        .trim() || "N/A";
+
+    const palletNo = document
+        .getElementById("palletNo")
+        .value
+        .trim() || "N/A";
+
+    const condition = getCondition();
+
+    if (!skuId) {
+        alert("Vui lòng nhập hoặc bắn mã SKU!");
+        document.getElementById("inputSku").focus();
+        return;
+    }
+
+    if (qty < 1) {
+        alert("Số lượng phải lớn hơn 0!");
+        return;
+    }
+
+    const now = new Date();
+
+    const item = {
+        date: date,
+        warehouse: warehouse,
+        skuId: skuId,
+        qty: qty,
+        condition: condition,
+        palletNo: palletNo,
+        staff: staff,
+        time: now.toLocaleTimeString("vi-VN")
+    };
+
+    queueList.push(item);
+
+    showRecentSku(item);
+    renderQueue();
+
+    document.getElementById("inputSku").value = "";
+    document.getElementById("inputQty").value = 1;
+    document.getElementById("inputSku").focus();
+}
+
+
+/* HIỂN THỊ SKU VỪA BẮN */
+function showRecentSku(item) {
+    document.getElementById("recentPlaceholder").style.display =
+        "none";
+
+    document.getElementById("recentSkuInfo").style.display =
+        "block";
+
+    document.getElementById("recentSkuId").textContent =
+        item.skuId;
+
+    const conditionElement =
+        document.getElementById("recentCondition");
+
+    conditionElement.textContent =
+        item.condition;
+
+    conditionElement.className =
+        item.condition === "Damage"
+            ? "tag-damage"
+            : "tag-good";
+
+    document.getElementById("recentQty").textContent =
+        "+" + item.qty;
+
+    document.getElementById("recentWarehouse").textContent =
+        item.warehouse;
+
+    document.getElementById("recentStaff").textContent =
+        item.staff;
+
+    document.getElementById("recentPallet").textContent =
+        item.palletNo;
+
+    document.getElementById("recentDate").textContent =
+        item.date;
+
+    document.getElementById("recentTime").textContent =
+        item.time;
+}
+
+
+/* HIỂN THỊ QUEUE */
+function renderQueue() {
+    const body =
+        document.getElementById("queueBody");
+
+    const counter =
+        document.getElementById("queueCounter");
+
+    counter.textContent =
+        queueList.length + " SKU";
+
+    if (queueList.length === 0) {
+        body.innerHTML = `
+            <tr>
+                <td
+                    colspan="5"
+                    style="
+                        text-align: center;
+                        color: var(--muted);
+                        padding: 25px;">
+                    Chưa có SKU trong queue
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    body.innerHTML = queueList
+        .map(function (item, index) {
+            const conditionClass =
+                item.condition === "Damage"
+                    ? "tag-damage"
+                    : "tag-good";
+
+            return `
+                <tr>
+                    <td>
+                        <strong>
+                            ${escapeHtml(item.skuId)}
+                        </strong>
+                    </td>
+
+                    <td class="${conditionClass}">
+                        ${escapeHtml(item.condition)}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(item.warehouse)}
+                        /
+                        ${escapeHtml(item.staff)}
+                        /
+                        ${escapeHtml(item.palletNo)}
+                    </td>
+
+                    <td class="qty">
+                        ${item.qty}
+                    </td>
+
+                    <td>
+                        <button
+                            class="delete"
+                            onclick="removeQueueItem(${index})">
+                            ×
+                        </button>
+                    </td>
+                </tr>
+            `;
+        })
+        .join("");
+}
+
+
+/* XÓA SKU KHỎI QUEUE */
+function removeQueueItem(index) {
+    queueList.splice(index, 1);
+    renderQueue();
+}
+
+
+/* LƯU QUEUE VÀO GOOGLE SHEETS */
+function saveQueueToSheet() {
+    if (queueList.length === 0) {
+        alert("Chưa có dữ liệu trong queue!");
+        return;
+    }
+
+    const saveButton =
+        document.getElementById("saveButton");
+
+    saveButton.disabled = true;
+    saveButton.textContent = "ĐANG LƯU...";
+
+    const payload = {};
+
+    queueList.forEach(function (item) {
+        if (!payload[item.warehouse]) {
+            payload[item.warehouse] = [];
+        }
+
+        payload[item.warehouse].push({
+            date: item.date,
+            skuId: item.skuId,
+            qty: item.qty,
+            condition: item.condition,
+            palletNo: item.palletNo,
+            staff: item.staff
+        });
+    });
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+    })
+    .then(function (response) {
+        return response.json();
+    })
+    .then(function (result) {
+        if (result.status !== "success") {
+            throw new Error(
+                result.message || "Lưu dữ liệu thất bại"
+            );
+        }
+
+        alert("Đã lưu dữ liệu vào Google Sheets!");
+
+        queueList = [];
+        renderQueue();
+
+        document
+            .getElementById("recentPlaceholder")
+            .style.display = "block";
+
+        document
+            .getElementById("recentSkuInfo")
+            .style.display = "none";
+    })
+    .catch(function (error) {
+        alert("Lỗi khi lưu dữ liệu: " + error.message);
+    })
+    .finally(function () {
+        saveButton.disabled = false;
+        saveButton.textContent = "DONE / LƯU SHEET";
+    });
+}
+
+
+/* TRA CỨU SKU TỪ SHEET ONH VNDL */
+function lookupSkuInventory() {
+    const sku = document
+        .getElementById("inputSku")
+        .value
+        .trim();
+
+    const resultBox =
+        document.getElementById("inventoryBox");
+
+    const counter =
+        document.getElementById("lookupCounter");
+
+    if (!sku) {
+        resultBox.innerHTML = `
+            <div class="message">
+                Vui lòng nhập hoặc bắn SKU để tra cứu
+            </div>
+        `;
+
+        counter.textContent = "0 LOCATIONS";
+        return;
+    }
+
+    resultBox.innerHTML = `
+        <div class="message">
+            Đang tra cứu SKU...
+        </div>
+    `;
+
+    const url =
+        GOOGLE_SCRIPT_URL +
+        "?action=lookupSku&sku=" +
+        encodeURIComponent(sku);
+
+    fetch(url, {
+        method: "GET",
+        cache: "no-store"
+    })
+    .then(function (response) {
+        return response.json();
+    })
+    .then(function (result) {
+        if (result.status !== "success") {
+            throw new Error(
+                result.message || "Không thể tra cứu SKU"
+            );
+        }
+
+        const data = result.data || [];
+
+        counter.textContent =
+            data.length + " LOCATIONS";
+
+        if (data.length === 0) {
+            resultBox.innerHTML = `
+                <div class="message">
+                    Không tìm thấy SKU trong sheet ONH VNDL
+                </div>
+            `;
+
+            return;
+        }
+
+        renderLookupTable(data);
+    })
+    .catch(function (error) {
+        counter.textContent = "0 LOCATIONS";
+
+        resultBox.innerHTML = `
+            <div class="message error-message">
+                Lỗi tra cứu:<br>
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+    });
+}
+
+
+/* HIỂN THỊ KẾT QUẢ TRA CỨU */
+function renderLookupTable(data) {
+    const resultBox =
+        document.getElementById("inventoryBox");
+
+    let html = `
+        <div class="table-box">
+            <table class="lookup-table">
+
+                <thead>
+                    <tr>
+                        <th>SKU ID</th>
+                        <th>SKU Name</th>
+                        <th>On-hand Qty</th>
+                        <th>Location</th>
+                        <th>Zone id</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+    `;
+
+    data.forEach(function (item) {
+        html += `
+            <tr>
+                <td>
+                    <strong>
+                        ${escapeHtml(item.skuId)}
+                    </strong>
+                </td>
+
+                <td
+                    class="sku-name-cell"
+                    title="${escapeHtml(item.skuName)}">
+                    ${escapeHtml(item.skuName)}
+                </td>
+
+                <td class="lookup-qty">
+                    ${formatNumber(item.onHandQty)}
+                </td>
+
+                <td>
+                    ${escapeHtml(item.location)}
+                </td>
+
+                <td>
+                    ${escapeHtml(item.zoneId)}
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    resultBox.innerHTML = html;
+}
+
+
+/* ĐỊNH DẠNG SỐ */
+function formatNumber(value) {
+    return Number(value || 0).toLocaleString("en-US");
+}
+
+
+/* BẢO VỆ HTML */
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+</script>
+
+</body>
+</html>
