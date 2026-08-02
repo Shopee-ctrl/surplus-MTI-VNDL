@@ -200,7 +200,7 @@ input[type="date"] {
     width: 100%;
 
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 6px;
 }
 
@@ -222,11 +222,13 @@ input[type="date"] {
 .condition input {
     width: 16px;
     height: 16px;
+    flex: 0 0 16px;
 }
 
 .condition span {
     font-size: .72rem;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .good {
@@ -235,6 +237,10 @@ input[type="date"] {
 
 .damage {
     color: var(--red);
+}
+
+.wrong {
+    color: var(--yellow);
 }
 
 .buttons {
@@ -448,6 +454,11 @@ tr:hover td {
     font-weight: bold;
 }
 
+.tag-wrong {
+    color: var(--yellow);
+    font-weight: bold;
+}
+
 .delete {
     width: 24px;
     height: 24px;
@@ -577,24 +588,43 @@ tr:hover td {
 
                     <div class="condition-row">
 
+                        <!-- GOOD -->
                         <label class="condition">
                             <input
-                                type="checkbox"
+                                type="radio"
+                                name="condition"
                                 id="chkGood"
+                                value="Good"
                                 checked>
 
                             <span class="good">
-                                GOOD - Hàng tốt
+                                GOOD
                             </span>
                         </label>
 
+                        <!-- DAMAGE -->
                         <label class="condition">
                             <input
-                                type="checkbox"
-                                id="chkDamage">
+                                type="radio"
+                                name="condition"
+                                id="chkDamage"
+                                value="Damage">
 
                             <span class="damage">
-                                DAMAGE - Hàng lỗi
+                                DAMAGE
+                            </span>
+                        </label>
+
+                        <!-- SAI HÀNG -->
+                        <label class="condition">
+                            <input
+                                type="radio"
+                                name="condition"
+                                id="chkWrong"
+                                value="Sai hàng">
+
+                            <span class="wrong">
+                                SAI HÀNG
                             </span>
                         </label>
 
@@ -782,7 +812,7 @@ tr:hover td {
 
 <script>
 const GOOGLE_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbwlvF9LqcWh_c57x-F4rBsTLmwdgY8qlSR_mGnwXd_c4w0VEFJYbDoE1f4udGLnlw7G/exec";
+"https://script.google.com/macros/s/AKfycbwIX_xNpRp8lf4NpnCef60mv5baGbBHnKdIggC8NnfghvFeNxKd0kX4OIokfIN3LRqU/exec";
 
 let queueList = [];
 let currentLookupSku = "";
@@ -868,7 +898,6 @@ document.addEventListener("DOMContentLoaded", function () {
             reloadCurrentLookup
         );
 
-    setupConditionEvents();
     renderQueue();
     inputSku.focus();
 });
@@ -890,37 +919,28 @@ function setToday() {
 }
 
 
-function setupConditionEvents() {
-    const good =
-        document.getElementById("chkGood");
+function getCondition() {
+    const selected =
+        document.querySelector(
+            'input[name="condition"]:checked'
+        );
 
-    const damage =
-        document.getElementById("chkDamage");
-
-    good.addEventListener("change", function () {
-        if (this.checked) {
-            damage.checked = false;
-        } else {
-            this.checked = true;
-        }
-    });
-
-    damage.addEventListener("change", function () {
-        if (this.checked) {
-            good.checked = false;
-        } else {
-            this.checked = true;
-        }
-    });
+    return selected
+        ? selected.value
+        : "Good";
 }
 
 
-function getCondition() {
-    return document
-        .getElementById("chkDamage")
-        .checked
-        ? "Damage"
-        : "Good";
+function getConditionClass(condition) {
+    if (condition === "Damage") {
+        return "tag-damage";
+    }
+
+    if (condition === "Sai hàng") {
+        return "tag-wrong";
+    }
+
+    return "tag-good";
 }
 
 
@@ -1008,9 +1028,7 @@ function showRecentSku(item) {
         item.condition;
 
     conditionElement.className =
-        item.condition === "Damage"
-            ? "tag-damage"
-            : "tag-good";
+        getConditionClass(item.condition);
 
     document
         .getElementById("recentQty")
@@ -1068,9 +1086,7 @@ function renderQueue() {
     body.innerHTML = queueList
         .map(function (item, index) {
             const conditionClass =
-                item.condition === "Damage"
-                    ? "tag-damage"
-                    : "tag-good";
+                getConditionClass(item.condition);
 
             return `
                 <tr>
