@@ -3,530 +3,403 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MTL Inventory Control</title>
+
+<title>MTL SYSTEM - Quản Lý Kiểm Kê</title>
 
 <style>
 :root {
-    --bg: #08111f;
-    --panel: #101c2e;
-    --input: #0d192b;
-    --border: #263c5b;
-    --text: #e8f0fa;
-    --muted: #8da1ba;
-    --cyan: #27d5f5;
-    --blue: #4c8dff;
-    --green: #19c886;
-    --red: #ff5c70;
-    --yellow: #ffc857;
+    --bg-main: #0d131d;
+    --bg-card: #151d2a;
+    --bg-input: #1c2638;
+    --border: #27354a;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --cyan: #00d2ff;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
-}
-
-html,
-body {
-    width: 100%;
-    min-width: 320px;
-    min-height: 100%;
+    font-family: Segoe UI, Arial, sans-serif;
 }
 
 body {
-    min-height: 100vh;
-    padding: 16px;
-    overflow-x: hidden;
+    background: var(--bg-main);
     color: var(--text);
-    background:
-        radial-gradient(
-            circle at top right,
-            rgba(39, 213, 245, .10),
-            transparent 32%
-        ),
-        linear-gradient(135deg, #08111f, #0b1729);
+    min-height: 100vh;
+    padding: 10px;
+    overflow: hidden;
 }
 
-button,
-input,
-select {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-}
-
-.app-shell {
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
-}
-
-.topbar {
-    width: 100%;
-    min-height: 48px;
+header {
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 4px 2px 14px;
-    margin-bottom: 14px;
-    border-bottom: 1px solid rgba(80, 120, 170, .25);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    min-width: 0;
+header h1 {
+    color: var(--cyan);
+    font-size: 1.1rem;
+    letter-spacing: 1px;
 }
 
-.brand-mark {
-    width: 38px;
-    height: 38px;
-    flex: 0 0 38px;
-    display: grid;
-    place-items: center;
-    color: #06101c;
-    background: linear-gradient(135deg, var(--cyan), var(--blue));
-    border-radius: 10px;
-    font-size: 1.2rem;
-    font-weight: 900;
-}
-
-.brand-text {
-    min-width: 0;
-}
-
-.brand h1 {
-    overflow: hidden;
-    color: var(--text);
-    font-size: 1.05rem;
-    letter-spacing: 1.2px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.brand p {
-    margin-top: 3px;
-    color: var(--muted);
-    font-size: .68rem;
-}
-
-.connection-status {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    flex: 0 0 auto;
-    padding: 7px 11px;
+.status {
     color: var(--green);
-    background: rgba(25, 200, 134, .08);
-    border: 1px solid rgba(25, 200, 134, .25);
-    border-radius: 999px;
-    font-size: .68rem;
-    font-weight: 700;
-    white-space: nowrap;
+    font-size: .7rem;
 }
 
-.status-dot {
-    width: 7px;
-    height: 7px;
-    background: var(--green);
-    border-radius: 50%;
-    box-shadow: 0 0 10px var(--green);
-}
-
-.dashboard {
+.app {
     display: grid;
-    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
-    grid-template-rows: minmax(320px, 1fr) minmax(240px, 1fr);
-    gap: clamp(10px, 1.2vw, 16px);
-    width: 100%;
-    min-height: calc(100vh - 94px);
+    grid-template-columns: 380px 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+    height: calc(100vh - 53px);
 }
 
-.panel {
-    width: 100%;
-    min-width: 0;
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
     min-height: 0;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    background: linear-gradient(
-        145deg,
-        rgba(20, 34, 56, .98),
-        rgba(13, 25, 43, .98)
-    );
-    border: 1px solid var(--border);
-    border-radius: 13px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, .25);
 }
 
-.panel-header {
-    min-width: 0;
-    min-height: 54px;
+.card-title {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 13px 15px;
-    border-bottom: 1px solid rgba(80, 120, 170, .18);
-}
-
-.panel-title {
-    min-width: 0;
-    display: flex;
     align-items: center;
-    gap: 8px;
-    overflow: hidden;
-    color: var(--text);
-    font-size: .76rem;
-    font-weight: 800;
-    letter-spacing: .6px;
-    text-overflow: ellipsis;
+    color: var(--cyan);
+    font-size: .75rem;
+    font-weight: bold;
     text-transform: uppercase;
-    white-space: nowrap;
+    margin-bottom: 7px;
 }
 
-.panel-title::before {
-    content: "";
-    width: 4px;
-    height: 17px;
-    flex: 0 0 4px;
-    background: linear-gradient(var(--cyan), var(--blue));
-    border-radius: 5px;
-}
-
-.panel-header-right {
+.card-title-right {
     display: flex;
     align-items: center;
     gap: 8px;
-    min-width: 0;
 }
 
-.panel-body {
-    flex: 1;
-    min-width: 0;
-    min-height: 0;
-    padding: 14px;
-}
-
-.badge {
+.counter {
     color: var(--muted);
-    font-size: .66rem;
-    font-weight: 700;
+    font-size: .68rem;
     white-space: nowrap;
+}
+
+.zone-1 {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.zone-2 {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.zone-3 {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.zone-4 {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
 }
 
-.field {
+.form-group {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    min-width: 0;
+    gap: 2px;
 }
 
-.field.full {
+.full {
     grid-column: span 2;
 }
 
-.field label {
+label {
     color: var(--muted);
     font-size: .64rem;
-    font-weight: 800;
-    letter-spacing: .5px;
+    font-weight: bold;
     text-transform: uppercase;
 }
 
 input,
 select {
     width: 100%;
-    min-width: 0;
-    min-height: 39px;
-    padding: 8px 10px;
-    color: var(--text);
-    background: rgba(7, 17, 31, .72);
+    padding: 7px 8px;
+    background: var(--bg-input);
+    color: white;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 4px;
     outline: none;
-    transition: .2s ease;
-}
-
-input::placeholder {
-    color: #60758f;
+    font-size: .8rem;
 }
 
 input:focus,
 select:focus {
     border-color: var(--cyan);
-    box-shadow: 0 0 0 3px rgba(39, 213, 245, .10);
 }
 
 input[type="date"] {
     color-scheme: dark;
 }
 
-.sku-input-row {
+.sku-row {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(75px, 1fr);
-    gap: 9px;
-    min-width: 0;
+    grid-template-columns: 2fr 1fr;
+    gap: 6px;
 }
 
-.sku-field input {
-    border-color: rgba(39, 213, 245, .65);
+.sku-row input:first-child {
+    border-color: var(--cyan);
 }
 
-.qty-field input {
-    border-color: rgba(25, 200, 134, .65);
+.sku-row input:last-child {
+    border-color: var(--green);
     text-align: center;
-    font-weight: 800;
+    font-weight: bold;
 }
 
-.condition-options {
+.condition-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
 }
 
-.condition-option {
-    min-width: 0;
-    min-height: 39px;
+.condition {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 9px;
-    background: rgba(7, 17, 31, .72);
+    gap: 6px;
+    padding: 7px 8px;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 4px;
+    background: var(--bg-input);
     cursor: pointer;
 }
 
-.condition-option input {
+.condition input {
     width: 16px;
-    min-width: 16px;
-    min-height: 16px;
-    accent-color: var(--green);
+    height: 16px;
 }
 
-.condition-option span {
-    overflow: hidden;
-    font-size: .68rem;
-    font-weight: 800;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.condition span {
+    font-size: .72rem;
+    font-weight: bold;
 }
 
-.good-text {
+.good {
     color: var(--green);
 }
 
-.damage-text {
+.damage {
     color: var(--red);
 }
 
-.form-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
-    margin-top: 15px;
+.buttons {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
 }
 
-.btn {
-    min-width: 0;
-    min-height: 41px;
-    padding: 8px;
-    border: 0;
-    border-radius: 8px;
-    font-size: .69rem;
-    font-weight: 900;
-    transition: .2s ease;
+.main-button {
+    flex: 1;
+    padding: 9px 4px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: .72rem;
+    font-weight: bold;
 }
 
-.btn:hover {
-    filter: brightness(1.08);
-    transform: translateY(-1px);
+.main-button:hover,
+.reload:hover,
+.delete:hover {
+    opacity: .8;
 }
 
-.btn:disabled {
-    opacity: .55;
-    cursor: not-allowed;
-    transform: none;
+.query {
+    background: var(--cyan);
+    color: black;
 }
 
-.btn-query {
-    color: #04101d;
-    background: linear-gradient(135deg, var(--cyan), #4dbbff);
+.save {
+    background: var(--green);
+    color: black;
 }
 
-.btn-save {
-    color: #03140d;
-    background: linear-gradient(135deg, var(--green), #35df9b);
-}
-
-.btn-refresh {
-    min-height: 29px;
-    padding: 5px 9px;
+.reload {
+    padding: 4px 8px;
+    background: var(--bg-input);
     color: var(--cyan);
-    background: rgba(39, 213, 245, .08);
-    border: 1px solid rgba(39, 213, 245, .30);
-    border-radius: 7px;
-    font-size: .63rem;
-    font-weight: 800;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: .65rem;
+    font-weight: bold;
 }
 
-.info-content {
-    width: 100%;
-    height: 100%;
+.info-box {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.empty-state,
-.loading-state,
-.error-state {
-    min-height: 150px;
-    display: grid;
-    place-items: center;
-    padding: 20px;
-    color: var(--muted);
+    background: var(--bg-input);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 10px;
     text-align: center;
-    font-size: .76rem;
+    overflow: auto;
 }
 
-.error-state {
-    color: var(--red);
+.placeholder {
+    color: var(--muted);
+    font-size: .8rem;
 }
 
-.loading-state {
-    display: block;
-    padding-top: 55px;
-}
-
-.loading-state::before {
-    content: "";
-    width: 24px;
-    height: 24px;
-    display: block;
-    margin: 0 auto 10px;
-    border: 3px solid rgba(39, 213, 245, .2);
-    border-top-color: var(--cyan);
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.recent-info {
+.sku-info {
     width: 100%;
 }
 
-.recent-sku-id {
-    margin-bottom: 12px;
+.recent-sku-name {
     color: var(--cyan);
-    font-size: 1.1rem;
-    font-weight: 900;
-    text-align: center;
-    word-break: break-all;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 6px;
 }
 
-.detail-row {
+.detail-line {
     display: flex;
     justify-content: space-between;
     gap: 10px;
-    padding: 7px 0;
-    border-bottom: 1px solid rgba(80, 120, 170, .16);
-    font-size: .73rem;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: .78rem;
 }
 
-.detail-row span:first-child {
+.detail-line span:first-child {
     color: var(--muted);
 }
 
-.detail-row strong,
-.detail-row span:last-child {
-    max-width: 65%;
-    overflow: hidden;
-    text-align: right;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.inventory-container,
-.queue-container {
-    width: 100%;
-    height: 100%;
-    min-width: 0;
+.inventory-box {
+    flex: 1;
     min-height: 0;
     overflow: auto;
-    border: 1px solid rgba(80, 120, 170, .16);
-    border-radius: 8px;
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    padding: 5px;
 }
 
-.table-scroll {
-    width: 100%;
-    min-width: 0;
-    overflow-x: auto;
+.message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--muted);
+    font-size: .8rem;
+    text-align: center;
+}
+
+.error-message {
+    color: var(--red);
+}
+
+.table-box {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: .72rem;
-}
-
-.lookup-table {
-    min-width: 760px;
-}
-
-.queue-table {
-    min-width: 630px;
+    font-size: .75rem;
 }
 
 th {
     position: sticky;
     top: 0;
     z-index: 2;
-    padding: 10px 8px;
+    padding: 7px 6px;
+    background: var(--bg-input);
     color: var(--muted);
-    background: #122137;
-    border-bottom: 1px solid var(--border);
-    font-size: .63rem;
-    font-weight: 900;
+    font-size: .68rem;
     text-align: left;
-    text-transform: uppercase;
     white-space: nowrap;
 }
 
 td {
-    padding: 9px 8px;
-    border-bottom: 1px solid rgba(80, 120, 170, .14);
+    padding: 7px 6px;
+    border-bottom: 1px solid var(--border);
     white-space: nowrap;
 }
 
-tbody tr:hover {
-    background: rgba(39, 213, 245, .06);
+tr:hover td {
+    background: rgba(0, 210, 255, .06);
 }
 
-.lookup-qty,
-.queue-qty {
+.qty {
     color: var(--green);
-    font-weight: 900;
+    font-weight: bold;
     text-align: center;
 }
 
+.lookup-qty {
+    color: var(--green);
+    font-weight: bold;
+    text-align: center;
+}
+
+.tag-good {
+    color: var(--green);
+    font-weight: bold;
+}
+
+.tag-damage {
+    color: var(--red);
+    font-weight: bold;
+}
+
+.delete {
+    background: transparent;
+    border: none;
+    color: var(--red);
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.lookup-table {
+    min-width: 780px;
+}
+
+.queue-table {
+    min-width: 650px;
+}
+
+/* Chỉ rút gọn SKU Name, không thay đổi layout */
 .sku-name-cell {
     width: 180px;
     max-width: 180px;
@@ -535,141 +408,21 @@ tbody tr:hover {
     white-space: nowrap;
 }
 
-.sku-name-cell[title] {
-    cursor: help;
-}
-
-.tag-good {
-    color: var(--green);
-    font-weight: 800;
-}
-
-.tag-damage {
-    color: var(--red);
-    font-weight: 800;
-}
-
-.delete-btn {
-    width: 25px;
-    height: 25px;
-    color: var(--red);
-    background: rgba(255, 92, 112, .08);
-    border: 1px solid rgba(255, 92, 112, .25);
-    border-radius: 6px;
-    font-size: 1rem;
-    line-height: 1;
-}
-
-@media (max-width: 1200px) and (min-width: 901px) {
-    .dashboard {
-        grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
-    }
-
-    .panel-header,
-    .panel-body {
-        padding-left: 11px;
-        padding-right: 11px;
-    }
-
-    .lookup-table {
-        min-width: 700px;
-    }
-}
-
-@media (max-height: 760px) and (min-width: 901px) {
-    body {
-        padding: 10px;
-    }
-
-    .topbar {
-        min-height: 40px;
-        padding-bottom: 9px;
-        margin-bottom: 9px;
-    }
-
-    .dashboard {
-        min-height: calc(100vh - 70px);
-        grid-template-rows: minmax(280px, 1fr) minmax(210px, 1fr);
-        gap: 10px;
-    }
-
-    .panel-header {
-        min-height: 44px;
-        padding-top: 8px;
-        padding-bottom: 8px;
-    }
-
-    .panel-body {
-        padding: 10px;
-    }
-
-    input,
-    select {
-        min-height: 34px;
-        padding: 6px 8px;
-    }
-
-    .form-actions {
-        margin-top: 9px;
-    }
-}
-
 @media (max-width: 900px) {
     body {
         overflow-x: hidden;
         overflow-y: auto;
     }
 
-    .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .dashboard {
+    .app {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        min-height: auto;
+        height: auto;
     }
 
-    .panel {
-        min-height: 360px;
-    }
-
-    .panel-body {
-        overflow: auto;
-    }
-}
-
-@media (max-width: 560px) {
-    body {
-        padding: 8px;
-    }
-
-    .brand h1 {
-        font-size: .9rem;
-    }
-
-    .connection-status {
-        font-size: .6rem;
-    }
-
-    .form-grid,
-    .condition-options,
-    .form-actions {
-        grid-template-columns: 1fr;
-    }
-
-    .field.full {
-        grid-column: span 1;
-    }
-
-    .sku-input-row {
-        grid-template-columns: 1fr;
-    }
-
-    .panel {
-        min-height: 390px;
+    .card {
+        width: 100%;
+        min-height: 350px;
     }
 }
 </style>
@@ -677,349 +430,313 @@ tbody tr:hover {
 
 <body>
 
-<div class="app-shell">
+<header>
+    <h1>MTL SYSTEM</h1>
+    <div class="status">● GOOGLE SHEETS</div>
+</header>
 
-    <header class="topbar">
-        <div class="brand">
-            <div class="brand-mark">M</div>
+<main class="app">
 
-            <div class="brand-text">
-                <h1>MTL INVENTORY CONTROL</h1>
-                <p>Inbound scanning and inventory monitoring</p>
-            </div>
+    <!-- KHU VỰC 1 -->
+    <section class="card zone-1">
+
+        <div class="card-title">
+            <span>1. Nhập Dữ Liệu</span>
         </div>
 
-        <div class="connection-status">
-            <span class="status-dot"></span>
-            GOOGLE SHEETS ONLINE
-        </div>
-    </header>
+        <form id="scanForm" class="form">
 
-    <main class="dashboard">
+            <div class="form-grid">
 
-        <!-- KHU VỰC 1 -->
-        <section class="panel">
+                <div class="form-group">
+                    <label for="inboundDate">
+                        Inbound Date
+                    </label>
 
-            <div class="panel-header">
-                <div class="panel-title">
-                    Nhập dữ liệu
+                    <input
+                        type="date"
+                        id="inboundDate">
                 </div>
 
-                <span class="badge">
-                    SCAN MODE
-                </span>
-            </div>
+                <div class="form-group">
+                    <label for="warehouse">
+                        Warehouse
+                    </label>
 
-            <div class="panel-body">
+                    <select id="warehouse">
+                        <option value="VNA">VNA</option>
+                        <option value="VNNL">VNNL</option>
+                        <option value="VNVL">VNVL</option>
+                    </select>
+                </div>
 
-                <form id="scanForm">
+                <div class="form-group">
+                    <label for="staff">
+                        Staff
+                    </label>
 
-                    <div class="form-grid">
+                    <input
+                        type="text"
+                        id="staff"
+                        placeholder="Nhập tên">
+                </div>
 
-                        <div class="field">
-                            <label for="inboundDate">
-                                Inbound Date
-                            </label>
+                <div class="form-group">
+                    <label for="palletNo">
+                        Pallet No.
+                    </label>
 
-                            <input
-                                type="date"
-                                id="inboundDate">
-                        </div>
+                    <input
+                        type="text"
+                        id="palletNo"
+                        placeholder="Số pallet">
+                </div>
 
-                        <div class="field">
-                            <label for="warehouse">
-                                Warehouse
-                            </label>
+                <div class="form-group full">
 
-                            <select id="warehouse">
-                                <option value="VNA">VNA</option>
-                                <option value="VNNL">VNNL</option>
-                                <option value="VNVL">VNVL</option>
-                            </select>
-                        </div>
+                    <div class="sku-row">
 
-                        <div class="field">
-                            <label for="staff">
-                                Staff
+                        <div>
+                            <label
+                                for="inputSku"
+                                style="color: var(--cyan);">
+                                Input SKU ID
                             </label>
 
                             <input
                                 type="text"
-                                id="staff"
-                                placeholder="Nhập tên staff">
+                                id="inputSku"
+                                placeholder="Bắn hoặc nhập SKU"
+                                autocomplete="off"
+                                autofocus>
                         </div>
 
-                        <div class="field">
-                            <label for="palletNo">
-                                Pallet No.
+                        <div>
+                            <label
+                                for="inputQty"
+                                style="color: var(--green);">
+                                Qty
                             </label>
 
                             <input
-                                type="text"
-                                id="palletNo"
-                                placeholder="Nhập pallet">
-                        </div>
-
-                        <div class="field full">
-
-                            <div class="sku-input-row">
-
-                                <div class="field sku-field">
-                                    <label for="inputSku">
-                                        Input SKU ID
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        id="inputSku"
-                                        placeholder="Scan hoặc nhập SKU"
-                                        autocomplete="off"
-                                        autofocus>
-                                </div>
-
-                                <div class="field qty-field">
-                                    <label for="inputQty">
-                                        Qty
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        id="inputQty"
-                                        value="1"
-                                        min="1">
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="field full">
-                            <label>Condition</label>
-
-                            <div class="condition-options">
-
-                                <label class="condition-option">
-                                    <input
-                                        type="checkbox"
-                                        id="chkGood"
-                                        checked>
-
-                                    <span class="good-text">
-                                        GOOD
-                                    </span>
-                                </label>
-
-                                <label class="condition-option">
-                                    <input
-                                        type="checkbox"
-                                        id="chkDamage">
-
-                                    <span class="damage-text">
-                                        DAMAGE
-                                    </span>
-                                </label>
-
-                            </div>
+                                type="number"
+                                id="inputQty"
+                                value="1"
+                                min="1">
                         </div>
 
                     </div>
 
-                    <div class="form-actions">
+                </div>
 
-                        <button
-                            type="submit"
-                            class="btn btn-query">
-                            QUERY / ENTER
-                        </button>
+                <div class="form-group full">
 
-                        <button
-                            type="button"
-                            class="btn btn-save"
-                            id="saveButton">
-                            DONE / LƯU SHEET
-                        </button>
+                    <label>Condition</label>
+
+                    <div class="condition-row">
+
+                        <label class="condition">
+                            <input
+                                type="checkbox"
+                                id="chkGood"
+                                checked>
+
+                            <span class="good">
+                                GOOD - Hàng tốt
+                            </span>
+                        </label>
+
+                        <label class="condition">
+                            <input
+                                type="checkbox"
+                                id="chkDamage">
+
+                            <span class="damage">
+                                DAMAGE - Hàng lỗi
+                            </span>
+                        </label>
 
                     </div>
 
-                </form>
-
-            </div>
-        </section>
-
-
-        <!-- KHU VỰC 2 -->
-        <section class="panel">
-
-            <div class="panel-header">
-                <div class="panel-title">
-                    SKU vừa bắn
                 </div>
 
-                <span class="badge">
-                    LATEST SCAN
-                </span>
             </div>
 
-            <div class="panel-body info-content">
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="main-button query">
+                    QUERY / ENTER
+                </button>
+
+                <button
+                    type="button"
+                    class="main-button save"
+                    id="saveButton">
+                    DONE / LƯU SHEET
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- KHU VỰC 2 -->
+    <section class="card zone-2">
+
+        <div class="card-title">
+            <span>2. Thông Tin SKU Vừa Bắn</span>
+        </div>
+
+        <div class="info-box">
+
+            <div
+                id="recentPlaceholder"
+                class="placeholder">
+                Chưa có thông tin SKU
+            </div>
+
+            <div
+                id="recentSkuInfo"
+                class="sku-info"
+                style="display: none;">
 
                 <div
-                    id="recentPlaceholder"
-                    class="empty-state">
-                    Chưa có SKU vừa bắn
+                    id="recentSkuId"
+                    class="recent-sku-name">
                 </div>
 
-                <div
-                    id="recentSkuInfo"
-                    class="recent-info"
-                    style="display: none;">
-
-                    <div
-                        id="recentSkuId"
-                        class="recent-sku-id">
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Tình trạng</span>
-                        <strong id="recentCondition"></strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Số lượng</span>
-                        <strong
-                            id="recentQty"
-                            class="good-text">
-                        </strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Warehouse</span>
-                        <strong
-                            id="recentWarehouse"
-                            style="color: var(--yellow);">
-                        </strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Staff</span>
-                        <strong id="recentStaff"></strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Pallet</span>
-                        <strong
-                            id="recentPallet"
-                            style="color: var(--cyan);">
-                        </strong>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Date</span>
-                        <span id="recentDate"></span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span>Time</span>
-                        <span id="recentTime"></span>
-                    </div>
-
+                <div class="detail-line">
+                    <span>Tình trạng:</span>
+                    <strong id="recentCondition"></strong>
                 </div>
 
-            </div>
-        </section>
-
-
-        <!-- KHU VỰC 3 -->
-        <section class="panel">
-
-            <div class="panel-header">
-
-                <div class="panel-title">
-                    Inventory Details
+                <div class="detail-line">
+                    <span>Số lượng:</span>
+                    <strong
+                        id="recentQty"
+                        class="good">
+                    </strong>
                 </div>
 
-                <div class="panel-header-right">
+                <div class="detail-line">
+                    <span>Kho:</span>
+                    <strong
+                        id="recentWarehouse"
+                        style="color: var(--yellow);">
+                    </strong>
+                </div>
 
-                    <span
-                        id="lookupCounter"
-                        class="badge">
-                        0 LOCATIONS
-                    </span>
+                <div class="detail-line">
+                    <span>Người nhập:</span>
+                    <strong id="recentStaff"></strong>
+                </div>
 
-                    <button
-                        type="button"
-                        id="reloadLookupButton"
-                        class="btn-refresh">
-                        ↻ REFRESH
-                    </button>
+                <div class="detail-line">
+                    <span>Pallet:</span>
+                    <strong
+                        id="recentPallet"
+                        style="color: var(--cyan);">
+                    </strong>
+                </div>
 
+                <div class="detail-line">
+                    <span>Ngày:</span>
+                    <span id="recentDate"></span>
+                </div>
+
+                <div class="detail-line">
+                    <span>Thời gian:</span>
+                    <span id="recentTime"></span>
                 </div>
 
             </div>
 
-            <div class="panel-body">
+        </div>
 
-                <div
-                    id="inventoryBox"
-                    class="inventory-container">
-
-                    <div class="empty-state">
-                        Scan SKU và nhấn Enter để tra cứu
-                    </div>
-
-                </div>
-
-            </div>
-        </section>
+    </section>
 
 
-        <!-- KHU VỰC 4 -->
-        <section class="panel">
+    <!-- KHU VỰC 3 -->
+    <section class="card zone-3">
 
-            <div class="panel-header">
+        <div class="card-title">
 
-                <div class="panel-title">
-                    Queue
-                </div>
+            <span>3. Inventory Details</span>
+
+            <div class="card-title-right">
 
                 <span
-                    id="queueCounter"
-                    class="badge">
-                    0 SKU
+                    id="lookupCounter"
+                    class="counter">
+                    0 LOCATIONS
                 </span>
 
-            </div>
-
-            <div class="panel-body">
-
-                <div class="queue-container">
-
-                    <div class="table-scroll">
-
-                        <table class="queue-table">
-
-                            <thead>
-                                <tr>
-                                    <th>SKU ID</th>
-                                    <th>Condition</th>
-                                    <th>Warehouse / Staff / Pallet</th>
-                                    <th>Qty</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-
-                            <tbody id="queueBody"></tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
+                <button
+                    type="button"
+                    id="reloadLookupButton"
+                    class="reload">
+                    ↻ TẢI LẠI
+                </button>
 
             </div>
-        </section>
 
-    </main>
-</div>
+        </div>
+
+        <div
+            id="inventoryBox"
+            class="inventory-box">
+
+            <div class="message">
+                Scan SKU và nhấn ENTER để tra cứu
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- KHU VỰC 4 -->
+    <section class="card zone-4">
+
+        <div class="card-title">
+
+            <span>4. Queue - Danh Sách Đã Bắn</span>
+
+            <span
+                id="queueCounter"
+                class="counter">
+                0 SKU
+            </span>
+
+        </div>
+
+        <div class="table-box">
+
+            <table class="queue-table">
+
+                <thead>
+                    <tr>
+                        <th>SKU ID</th>
+                        <th>Condition</th>
+                        <th>Warehouse / Staff / Pallet</th>
+                        <th>Qty</th>
+                        <th>Xóa</th>
+                    </tr>
+                </thead>
+
+                <tbody id="queueBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
 
 
 <script>
@@ -1043,8 +760,8 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("inputQty");
 
     /*
-     * Enter lần 1 tại SKU:
-     * Chuyển sang ô Qty
+     * Enter lần 1 ở SKU:
+     * Chuyển sang ô Qty.
      */
     inputSku.addEventListener("keydown", function (event) {
         if (event.key !== "Enter") {
@@ -1054,7 +771,7 @@ document.addEventListener("DOMContentLoaded", function () {
         event.preventDefault();
 
         if (!inputSku.value.trim()) {
-            alert("Vui lòng nhập hoặc scan SKU!");
+            alert("Vui lòng nhập hoặc bắn mã SKU!");
             inputSku.focus();
             return;
         }
@@ -1064,8 +781,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /*
-     * Enter lần 2 tại Qty:
-     * Submit form
+     * Enter lần 2 ở Qty:
+     * Submit form.
      */
     inputQty.addEventListener("keydown", function (event) {
         if (event.key !== "Enter") {
@@ -1077,8 +794,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /*
-     * Submit form:
-     * Tra cứu SKU và thêm vào Queue
+     * Submit:
+     * Tra cứu SKU và thêm vào Queue.
      */
     scanForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -1086,7 +803,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const sku = inputSku.value.trim();
 
         if (!sku) {
-            alert("Vui lòng nhập hoặc scan SKU!");
+            alert("Vui lòng nhập hoặc bắn mã SKU!");
             inputSku.focus();
             return;
         }
@@ -1104,17 +821,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document
         .getElementById("reloadLookupButton")
-        .addEventListener("click", function () {
-            const sku = inputSku.value.trim();
+        .addEventListener(
+            "click",
+            function () {
+                const sku = inputSku.value.trim();
 
-            if (sku) {
-                lookupCache.delete(
-                    sku.toLowerCase()
-                );
+                if (sku) {
+                    lookupCache.delete(
+                        sku.toLowerCase()
+                    );
+                }
+
+                lookupSkuInventory();
             }
-
-            lookupSkuInventory();
-        });
+        );
 
     setupConditionEvents();
     renderQueue();
@@ -1189,23 +909,27 @@ function addToQueue() {
         document.getElementById("warehouse").value;
 
     const staff =
-        document.getElementById("staff").value.trim() ||
-        "N/A";
+        document
+            .getElementById("staff")
+            .value
+            .trim() || "N/A";
 
     const palletNo =
-        document.getElementById("palletNo").value.trim() ||
-        "N/A";
+        document
+            .getElementById("palletNo")
+            .value
+            .trim() || "N/A";
 
     const condition = getCondition();
 
     if (!skuId) {
-        alert("Vui lòng nhập hoặc scan SKU!");
+        alert("Vui lòng nhập hoặc bắn mã SKU!");
         inputSku.focus();
         return;
     }
 
     if (qty < 1) {
-        alert("Qty phải lớn hơn 0!");
+        alert("Số lượng phải lớn hơn 0!");
         inputQty.focus();
         return;
     }
@@ -1250,7 +974,8 @@ function showRecentSku(item) {
     const conditionElement =
         document.getElementById("recentCondition");
 
-    conditionElement.textContent = item.condition;
+    conditionElement.textContent =
+        item.condition;
 
     conditionElement.className =
         item.condition === "Damage"
@@ -1299,10 +1024,10 @@ function renderQueue() {
                 <td
                     colspan="5"
                     style="
-                        text-align:center;
-                        color:var(--muted);
-                        padding:30px;">
-                    Queue đang trống
+                        text-align: center;
+                        color: var(--muted);
+                        padding: 25px;">
+                    Chưa có SKU trong queue
                 </td>
             </tr>
         `;
@@ -1337,14 +1062,14 @@ function renderQueue() {
                         ${escapeHtml(item.palletNo)}
                     </td>
 
-                    <td class="queue-qty">
+                    <td class="qty">
                         ${item.qty}
                     </td>
 
                     <td>
                         <button
                             type="button"
-                            class="delete-btn"
+                            class="delete"
                             onclick="removeQueueItem(${index})">
                             ×
                         </button>
@@ -1364,7 +1089,7 @@ function removeQueueItem(index) {
 
 function saveQueueToSheet() {
     if (queueList.length === 0) {
-        alert("Queue đang trống!");
+        alert("Chưa có dữ liệu trong queue!");
         return;
     }
 
@@ -1413,7 +1138,7 @@ function saveQueueToSheet() {
 
         document
             .getElementById("recentPlaceholder")
-            .style.display = "grid";
+            .style.display = "block";
 
         document
             .getElementById("recentSkuInfo")
@@ -1448,8 +1173,8 @@ function lookupSkuInventory() {
 
     if (!sku) {
         resultBox.innerHTML = `
-            <div class="empty-state">
-                Scan SKU và nhấn Enter để tra cứu
+            <div class="message">
+                Scan SKU và nhấn ENTER để tra cứu
             </div>
         `;
 
@@ -1468,7 +1193,7 @@ function lookupSkuInventory() {
 
         if (cachedData.length === 0) {
             resultBox.innerHTML = `
-                <div class="empty-state">
+                <div class="message">
                     Không tìm thấy SKU
                 </div>
             `;
@@ -1480,8 +1205,8 @@ function lookupSkuInventory() {
     }
 
     resultBox.innerHTML = `
-        <div class="loading-state">
-            Đang tải dữ liệu...
+        <div class="message">
+            Đang tra cứu SKU...
         </div>
     `;
 
@@ -1514,7 +1239,7 @@ function lookupSkuInventory() {
 
         if (data.length === 0) {
             resultBox.innerHTML = `
-                <div class="empty-state">
+                <div class="message">
                     Không tìm thấy SKU trong ONH VNDL
                 </div>
             `;
@@ -1528,7 +1253,7 @@ function lookupSkuInventory() {
         counter.textContent = "0 LOCATIONS";
 
         resultBox.innerHTML = `
-            <div class="error-state">
+            <div class="message error-message">
                 Lỗi tra cứu:<br>
                 ${escapeHtml(error.message)}
             </div>
@@ -1542,7 +1267,8 @@ function renderLookupTable(data) {
         document.getElementById("inventoryBox");
 
     let html = `
-        <div class="table-scroll">
+        <div class="table-box">
+
             <table class="lookup-table">
 
                 <thead>
@@ -1591,6 +1317,7 @@ function renderLookupTable(data) {
     html += `
                 </tbody>
             </table>
+
         </div>
     `;
 
