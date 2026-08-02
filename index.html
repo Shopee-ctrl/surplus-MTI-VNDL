@@ -27,21 +27,28 @@
     font-family: Segoe UI, Arial, sans-serif;
 }
 
+html,
 body {
-    background: var(--bg-main);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 10px;
+    width: 100%;
+    min-width: 1380px;
+    min-height: 900px;
     overflow: hidden;
 }
 
+body {
+    background: var(--bg-main);
+    color: var(--text);
+    padding: 10px;
+}
+
 header {
+    width: 1360px;
     height: 35px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 8px;
+    margin: 0 auto 8px auto;
 }
 
 header h1 {
@@ -56,28 +63,42 @@ header h1 {
 }
 
 .app {
+    width: 1360px;
+    height: 820px;
+    margin: 0 auto;
+
     display: grid;
-    grid-template-columns: 380px 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 380px 970px;
+    grid-template-rows: 405px 405px;
     gap: 10px;
-    height: calc(100vh - 53px);
+
+    overflow: hidden;
 }
 
 .card {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 10px;
-    min-height: 0;
+
     overflow: hidden;
     display: flex;
     flex-direction: column;
 }
 
 .card-title {
+    height: 24px;
+    flex: 0 0 24px;
+
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+
     color: var(--cyan);
     font-size: .75rem;
     font-weight: bold;
@@ -118,19 +139,23 @@ header h1 {
 }
 
 .form {
+    width: 100%;
+    height: calc(100% - 31px);
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    flex: 1;
 }
 
 .form-grid {
+    width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px;
 }
 
 .form-group {
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -150,7 +175,10 @@ label {
 input,
 select {
     width: 100%;
+    max-width: 100%;
+    height: 32px;
     padding: 7px 8px;
+
     background: var(--bg-input);
     color: white;
     border: 1px solid var(--border);
@@ -169,6 +197,7 @@ input[type="date"] {
 }
 
 .sku-row {
+    width: 100%;
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 6px;
@@ -185,15 +214,19 @@ input[type="date"] {
 }
 
 .condition-row {
+    width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px;
 }
 
 .condition {
+    height: 32px;
+
     display: flex;
     align-items: center;
     gap: 6px;
+
     padding: 7px 8px;
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -220,17 +253,20 @@ input[type="date"] {
 }
 
 .buttons {
+    width: 100%;
     display: flex;
     gap: 6px;
     margin-top: 8px;
 }
 
 .main-button {
+    height: 36px;
     flex: 1;
-    padding: 9px 4px;
+
     border: none;
     border-radius: 4px;
     cursor: pointer;
+
     font-size: .72rem;
     font-weight: bold;
 }
@@ -239,6 +275,11 @@ input[type="date"] {
 .reload:hover,
 .delete:hover {
     opacity: .8;
+}
+
+.main-button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
 }
 
 .query {
@@ -252,24 +293,31 @@ input[type="date"] {
 }
 
 .reload {
+    height: 25px;
     padding: 4px 8px;
+
     background: var(--bg-input);
     color: var(--cyan);
     border: 1px solid var(--border);
     border-radius: 4px;
+
     cursor: pointer;
     font-size: .65rem;
     font-weight: bold;
 }
 
 .info-box {
-    flex: 1;
+    width: 100%;
+    height: calc(100% - 31px);
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     background: var(--bg-input);
     border: 1px dashed var(--border);
     border-radius: 6px;
+
     padding: 10px;
     text-align: center;
     overflow: auto;
@@ -295,6 +343,7 @@ input[type="date"] {
     display: flex;
     justify-content: space-between;
     gap: 10px;
+
     padding: 4px 0;
     border-bottom: 1px solid var(--border);
     font-size: .78rem;
@@ -304,20 +353,35 @@ input[type="date"] {
     color: var(--muted);
 }
 
+.detail-line strong,
+.detail-line span:last-child {
+    max-width: 65%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .inventory-box {
-    flex: 1;
+    width: 100%;
+    height: calc(100% - 31px);
+    min-width: 0;
     min-height: 0;
+
     overflow: auto;
+
     border: 1px dashed var(--border);
     border-radius: 4px;
     padding: 5px;
 }
 
 .message {
+    width: 100%;
+    height: 100%;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
+
     color: var(--muted);
     font-size: .8rem;
     text-align: center;
@@ -328,7 +392,9 @@ input[type="date"] {
 }
 
 .table-box {
-    flex: 1;
+    width: 100%;
+    height: calc(100% - 31px);
+    min-width: 0;
     min-height: 0;
     overflow: auto;
 }
@@ -339,13 +405,25 @@ table {
     font-size: .75rem;
 }
 
+.lookup-table {
+    width: 100%;
+    min-width: 900px;
+}
+
+.queue-table {
+    width: 100%;
+    min-width: 650px;
+}
+
 th {
     position: sticky;
     top: 0;
     z-index: 2;
+
     padding: 7px 6px;
     background: var(--bg-input);
     color: var(--muted);
+
     font-size: .68rem;
     text-align: left;
     white-space: nowrap;
@@ -361,12 +439,7 @@ tr:hover td {
     background: rgba(0, 210, 255, .06);
 }
 
-.qty {
-    color: var(--green);
-    font-weight: bold;
-    text-align: center;
-}
-
+.qty,
 .lookup-qty {
     color: var(--green);
     font-weight: bold;
@@ -384,46 +457,28 @@ tr:hover td {
 }
 
 .delete {
+    width: 24px;
+    height: 24px;
+
     background: transparent;
     border: none;
     color: var(--red);
+
     cursor: pointer;
     font-size: 1rem;
 }
 
-.lookup-table {
-    min-width: 780px;
-}
-
-.queue-table {
-    min-width: 650px;
-}
-
-/* Chỉ rút gọn SKU Name, không thay đổi layout */
 .sku-name-cell {
     width: 180px;
     max-width: 180px;
+
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-@media (max-width: 900px) {
-    body {
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
-
-    .app {
-        display: flex;
-        flex-direction: column;
-        height: auto;
-    }
-
-    .card {
-        width: 100%;
-        min-height: 350px;
-    }
+.sku-name-cell[title] {
+    cursor: help;
 }
 </style>
 </head>
@@ -580,7 +635,6 @@ tr:hover td {
             </div>
 
         </form>
-
     </section>
 
 
@@ -744,7 +798,8 @@ const GOOGLE_SCRIPT_URL =
 "https://script.google.com/macros/s/AKfycbwIX_xNpRp8lf4NpnCef60mv5baGbBHnKdIggC8NnfghvFeNxKd0kX4OIokfIN3LRqU/exec";
 
 let queueList = [];
-const lookupCache = new Map();
+let currentLookupSku = "";
+let lookupCache = new Map();
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -760,7 +815,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("inputQty");
 
     /*
-     * Enter lần 1 ở SKU:
+     * Enter lần 1 tại ô SKU:
      * Chuyển sang ô Qty.
      */
     inputSku.addEventListener("keydown", function (event) {
@@ -781,7 +836,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /*
-     * Enter lần 2 ở Qty:
+     * Enter lần 2 tại ô Qty:
      * Submit form.
      */
     inputQty.addEventListener("keydown", function (event) {
@@ -790,6 +845,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         event.preventDefault();
+
         scanForm.requestSubmit();
     });
 
@@ -823,17 +879,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .getElementById("reloadLookupButton")
         .addEventListener(
             "click",
-            function () {
-                const sku = inputSku.value.trim();
-
-                if (sku) {
-                    lookupCache.delete(
-                        sku.toLowerCase()
-                    );
-                }
-
-                lookupSkuInventory();
-            }
+            reloadCurrentLookup
         );
 
     setupConditionEvents();
@@ -934,8 +980,6 @@ function addToQueue() {
         return;
     }
 
-    const now = new Date();
-
     const item = {
         date: date,
         warehouse: warehouse,
@@ -944,7 +988,7 @@ function addToQueue() {
         condition: condition,
         palletNo: palletNo,
         staff: staff,
-        time: now.toLocaleTimeString("vi-VN")
+        time: new Date().toLocaleTimeString("vi-VN")
     };
 
     queueList.push(item);
@@ -1182,6 +1226,8 @@ function lookupSkuInventory() {
         return;
     }
 
+    currentLookupSku = sku;
+
     const cacheKey = sku.toLowerCase();
 
     if (lookupCache.has(cacheKey)) {
@@ -1241,6 +1287,91 @@ function lookupSkuInventory() {
             resultBox.innerHTML = `
                 <div class="message">
                     Không tìm thấy SKU trong ONH VNDL
+                </div>
+            `;
+
+            return;
+        }
+
+        renderLookupTable(data);
+    })
+    .catch(function (error) {
+        counter.textContent = "0 LOCATIONS";
+
+        resultBox.innerHTML = `
+            <div class="message error-message">
+                Lỗi tra cứu:<br>
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+    });
+}
+
+
+function reloadCurrentLookup() {
+    if (!currentLookupSku) {
+        document
+            .getElementById("inputSku")
+            .focus();
+
+        return;
+    }
+
+    lookupCache.delete(
+        currentLookupSku.toLowerCase()
+    );
+
+    lookupSkuByValue(currentLookupSku);
+}
+
+
+function lookupSkuByValue(sku) {
+    const resultBox =
+        document.getElementById("inventoryBox");
+
+    const counter =
+        document.getElementById("lookupCounter");
+
+    resultBox.innerHTML = `
+        <div class="message">
+            Đang tải lại dữ liệu...
+        </div>
+    `;
+
+    const url =
+        GOOGLE_SCRIPT_URL +
+        "?action=lookupSku&sku=" +
+        encodeURIComponent(sku);
+
+    fetch(url, {
+        method: "GET",
+        cache: "no-store"
+    })
+    .then(function (response) {
+        return response.json();
+    })
+    .then(function (result) {
+        if (result.status !== "success") {
+            throw new Error(
+                result.message ||
+                "Không thể tải dữ liệu"
+            );
+        }
+
+        const data = result.data || [];
+
+        lookupCache.set(
+            sku.toLowerCase(),
+            data
+        );
+
+        counter.textContent =
+            data.length + " LOCATIONS";
+
+        if (data.length === 0) {
+            resultBox.innerHTML = `
+                <div class="message">
+                    Không tìm thấy SKU
                 </div>
             `;
 
