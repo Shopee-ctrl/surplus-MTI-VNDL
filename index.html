@@ -243,6 +243,27 @@ input[type="date"] {
     color: var(--yellow);
 }
 
+/*
+ * Ô SKU ĐÚNG
+ * Mặc định ẩn, chỉ hiện khi chọn SAI HÀNG
+ */
+.correct-sku-group {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+}
+
+.correct-sku-label {
+    color: var(--yellow);
+}
+
+#correctSku {
+    width: 100%;
+    border-color: var(--yellow);
+}
+
 .buttons {
     width: 100%;
 
@@ -409,7 +430,7 @@ table {
 
 .queue-table {
     width: 100%;
-    min-width: 650px;
+    min-width: 750px;
 }
 
 th {
@@ -588,7 +609,6 @@ tr:hover td {
 
                     <div class="condition-row">
 
-                        <!-- GOOD -->
                         <label class="condition">
                             <input
                                 type="radio"
@@ -602,7 +622,6 @@ tr:hover td {
                             </span>
                         </label>
 
-                        <!-- DAMAGE -->
                         <label class="condition">
                             <input
                                 type="radio"
@@ -615,7 +634,6 @@ tr:hover td {
                             </span>
                         </label>
 
-                        <!-- SAI HÀNG -->
                         <label class="condition">
                             <input
                                 type="radio"
@@ -627,6 +645,25 @@ tr:hover td {
                                 SAI HÀNG
                             </span>
                         </label>
+
+                    </div>
+
+                    <!-- Ô NHẬP SKU ĐÚNG -->
+                    <div
+                        id="correctSkuGroup"
+                        class="correct-sku-group">
+
+                        <label
+                            for="correctSku"
+                            class="correct-sku-label">
+                            SKU ĐÚNG
+                        </label>
+
+                        <input
+                            type="text"
+                            id="correctSku"
+                            placeholder="Nhập SKU đúng"
+                            autocomplete="off">
 
                     </div>
 
@@ -715,6 +752,14 @@ tr:hover td {
                 </div>
 
                 <div class="detail-line">
+                    <span>SKU đúng:</span>
+                    <strong
+                        id="recentCorrectSku"
+                        style="color: var(--yellow);">
+                    </strong>
+                </div>
+
+                <div class="detail-line">
                     <span>Ngày:</span>
                     <span id="recentDate"></span>
                 </div>
@@ -794,6 +839,7 @@ tr:hover td {
                         <th>SKU ID</th>
                         <th>Condition</th>
                         <th>Warehouse / Staff / Pallet</th>
+                        <th>SKU Đúng</th>
                         <th>Qty</th>
                         <th>Xóa</th>
                     </tr>
@@ -812,7 +858,7 @@ tr:hover td {
 
 <script>
 const GOOGLE_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbwIX_xNpRp8lf4NpnCef60mv5baGbBHnKdIggC8NnfghvFeNxKd0kX4OIokfIN3LRqU/exec";
+"https://script.google.com/macros/s/AKfycbzr2Kww5Y3Q71yxSp-Dk3GD-F3VEGIcETpNqloYYoa5KtOew9RFN-33b29sIcpTPrlJ/exec";
 
 let queueList = [];
 let currentLookupSku = "";
@@ -830,6 +876,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const inputQty =
         document.getElementById("inputQty");
+
+    const conditionInputs =
+        document.querySelectorAll(
+            'input[name="condition"]'
+        );
 
     /*
      * Enter lần 1 tại ô SKU:
@@ -866,6 +917,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /*
+     * Chọn Condition:
+     * Hiện/ẩn ô SKU đúng.
+     */
+    conditionInputs.forEach(function (input) {
+        input.addEventListener(
+            "change",
+            toggleCorrectSkuField
+        );
+    });
+
+    /*
      * Submit:
      * Tra cứu SKU và thêm Queue.
      */
@@ -898,6 +960,7 @@ document.addEventListener("DOMContentLoaded", function () {
             reloadCurrentLookup
         );
 
+    toggleCorrectSkuField();
     renderQueue();
     inputSku.focus();
 });
@@ -919,6 +982,9 @@ function setToday() {
 }
 
 
+/*
+ * Lấy Condition đang chọn
+ */
 function getCondition() {
     const selected =
         document.querySelector(
@@ -928,6 +994,36 @@ function getCondition() {
     return selected
         ? selected.value
         : "Good";
+}
+
+
+/*
+ * Hiện ô SKU ĐÚNG khi chọn SAI HÀNG
+ */
+function toggleCorrectSkuField() {
+    const selected =
+        document.querySelector(
+            'input[name="condition"]:checked'
+        );
+
+    const correctSkuGroup =
+        document.getElementById(
+            "correctSkuGroup"
+        );
+
+    const correctSkuInput =
+        document.getElementById("correctSku");
+
+    if (!selected || !correctSkuGroup) {
+        return;
+    }
+
+    if (selected.value === "Sai hàng") {
+        correctSkuGroup.style.display = "flex";
+    } else {
+        correctSkuGroup.style.display = "none";
+        correctSkuInput.value = "";
+    }
 }
 
 
@@ -944,6 +1040,9 @@ function getConditionClass(condition) {
 }
 
 
+/*
+ * Thêm dữ liệu vào Queue
+ */
 function addToQueue() {
     const inputSku =
         document.getElementById("inputSku");
@@ -974,6 +1073,12 @@ function addToQueue() {
 
     const condition = getCondition();
 
+    const correctSku =
+        document
+            .getElementById("correctSku")
+            .value
+            .trim();
+
     if (!skuId) {
         alert("Vui lòng nhập hoặc bắn mã SKU!");
         inputSku.focus();
@@ -986,6 +1091,19 @@ function addToQueue() {
         return;
     }
 
+    if (
+        condition === "Sai hàng" &&
+        !correctSku
+    ) {
+        alert("Vui lòng nhập SKU đúng!");
+
+        document
+            .getElementById("correctSku")
+            .focus();
+
+        return;
+    }
+
     const item = {
         date: date,
         warehouse: warehouse,
@@ -994,6 +1112,7 @@ function addToQueue() {
         condition: condition,
         palletNo: palletNo,
         staff: staff,
+        correctSku: correctSku,
         time: new Date().toLocaleTimeString("vi-VN")
     };
 
@@ -1002,12 +1121,29 @@ function addToQueue() {
     showRecentSku(item);
     renderQueue();
 
+    /*
+     * Reset form sau khi thêm Queue
+     */
     inputSku.value = "";
     inputQty.value = 1;
+
+    document
+        .getElementById("correctSku")
+        .value = "";
+
+    document
+        .getElementById("chkGood")
+        .checked = true;
+
+    toggleCorrectSkuField();
+
     inputSku.focus();
 }
 
 
+/*
+ * Hiển thị SKU vừa bắn
+ */
 function showRecentSku(item) {
     document
         .getElementById("recentPlaceholder")
@@ -1047,6 +1183,10 @@ function showRecentSku(item) {
         .textContent = item.palletNo;
 
     document
+        .getElementById("recentCorrectSku")
+        .textContent = item.correctSku || "N/A";
+
+    document
         .getElementById("recentDate")
         .textContent = item.date;
 
@@ -1056,6 +1196,9 @@ function showRecentSku(item) {
 }
 
 
+/*
+ * Hiển thị Queue
+ */
 function renderQueue() {
     const body =
         document.getElementById("queueBody");
@@ -1070,7 +1213,7 @@ function renderQueue() {
         body.innerHTML = `
             <tr>
                 <td
-                    colspan="5"
+                    colspan="6"
                     style="
                         text-align: center;
                         color: var(--muted);
@@ -1108,6 +1251,12 @@ function renderQueue() {
                         ${escapeHtml(item.palletNo)}
                     </td>
 
+                    <td>
+                        ${escapeHtml(
+                            item.correctSku || "N/A"
+                        )}
+                    </td>
+
                     <td class="qty">
                         ${item.qty}
                     </td>
@@ -1133,6 +1282,9 @@ function removeQueueItem(index) {
 }
 
 
+/*
+ * Lưu Queue vào Google Sheets
+ */
 function saveQueueToSheet() {
     if (queueList.length === 0) {
         alert("Chưa có dữ liệu trong queue!");
@@ -1158,7 +1310,8 @@ function saveQueueToSheet() {
             qty: item.qty,
             condition: item.condition,
             palletNo: item.palletNo,
-            staff: item.staff
+            staff: item.staff,
+            correctSku: item.correctSku || ""
         });
     });
 
@@ -1204,6 +1357,9 @@ function saveQueueToSheet() {
 }
 
 
+/*
+ * Tra cứu SKU
+ */
 function lookupSkuInventory() {
     const sku =
         document
@@ -1310,6 +1466,9 @@ function lookupSkuInventory() {
 }
 
 
+/*
+ * Tải lại kết quả tra cứu hiện tại
+ */
 function reloadCurrentLookup() {
     if (!currentLookupSku) {
         document
@@ -1395,6 +1554,9 @@ function lookupSkuByValue(sku) {
 }
 
 
+/*
+ * Hiển thị bảng Inventory
+ */
 function renderLookupTable(data) {
     const resultBox =
         document.getElementById("inventoryBox");
