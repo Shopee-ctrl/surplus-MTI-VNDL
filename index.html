@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>MTL SYSTEM - Quản Lý Kiểm Kê</title>
+<title>MTL SYSTEM</title>
 
 <style>
 :root {
@@ -30,48 +30,27 @@
 html,
 body {
     width: 100%;
-    min-width: 1380px;
-    min-height: 900px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
     overflow: hidden;
 }
 
 body {
     background: var(--bg-main);
     color: var(--text);
-    padding: 10px;
-}
-
-header {
-    width: 1360px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    margin: 0 auto 8px auto;
-}
-
-header h1 {
-    color: var(--cyan);
-    font-size: 1.1rem;
-    letter-spacing: 1px;
-}
-
-.status {
-    color: var(--green);
-    font-size: .7rem;
 }
 
 .app {
-    width: 1360px;
-    height: 820px;
-    margin: 0 auto;
+    width: 100vw;
+    height: 100vh;
 
     display: grid;
-    grid-template-columns: 380px 970px;
-    grid-template-rows: 405px 405px;
+    grid-template-columns: 380px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
     gap: 10px;
 
+    padding: 10px;
     overflow: hidden;
 }
 
@@ -149,6 +128,7 @@ header h1 {
 
 .form-grid {
     width: 100%;
+
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px;
@@ -156,6 +136,7 @@ header h1 {
 
 .form-group {
     min-width: 0;
+
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -177,6 +158,7 @@ select {
     width: 100%;
     max-width: 100%;
     height: 32px;
+
     padding: 7px 8px;
 
     background: var(--bg-input);
@@ -198,6 +180,7 @@ input[type="date"] {
 
 .sku-row {
     width: 100%;
+
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 6px;
@@ -215,6 +198,7 @@ input[type="date"] {
 
 .condition-row {
     width: 100%;
+
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px;
@@ -228,6 +212,7 @@ input[type="date"] {
     gap: 6px;
 
     padding: 7px 8px;
+
     border: 1px solid var(--border);
     border-radius: 4px;
     background: var(--bg-input);
@@ -254,6 +239,7 @@ input[type="date"] {
 
 .buttons {
     width: 100%;
+
     display: flex;
     gap: 6px;
     margin-top: 8px;
@@ -294,6 +280,7 @@ input[type="date"] {
 
 .reload {
     height: 25px;
+
     padding: 4px 8px;
 
     background: var(--bg-input);
@@ -356,6 +343,7 @@ input[type="date"] {
 .detail-line strong,
 .detail-line span:last-child {
     max-width: 65%;
+
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -364,6 +352,7 @@ input[type="date"] {
 .inventory-box {
     width: 100%;
     height: calc(100% - 31px);
+
     min-width: 0;
     min-height: 0;
 
@@ -394,8 +383,10 @@ input[type="date"] {
 .table-box {
     width: 100%;
     height: calc(100% - 31px);
+
     min-width: 0;
     min-height: 0;
+
     overflow: auto;
 }
 
@@ -421,6 +412,7 @@ th {
     z-index: 2;
 
     padding: 7px 6px;
+
     background: var(--bg-input);
     color: var(--muted);
 
@@ -484,11 +476,6 @@ tr:hover td {
 </head>
 
 <body>
-
-<header>
-    <h1>MTL SYSTEM</h1>
-    <div class="status">● GOOGLE SHEETS</div>
-</header>
 
 <main class="app">
 
@@ -799,7 +786,7 @@ const GOOGLE_SCRIPT_URL =
 
 let queueList = [];
 let currentLookupSku = "";
-let lookupCache = new Map();
+const lookupCache = new Map();
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -845,13 +832,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         event.preventDefault();
-
         scanForm.requestSubmit();
     });
 
     /*
      * Submit:
-     * Tra cứu SKU và thêm vào Queue.
+     * Tra cứu SKU và thêm Queue.
      */
     scanForm.addEventListener("submit", function (event) {
         event.preventDefault();
