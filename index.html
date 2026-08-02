@@ -9,10 +9,8 @@
 :root {
     --bg: #08111f;
     --panel: #101c2e;
-    --panel-2: #142238;
     --input: #0d192b;
-    --border: #223653;
-    --border-light: #2e486b;
+    --border: #263c5b;
     --text: #e8f0fa;
     --muted: #8da1ba;
     --cyan: #27d5f5;
@@ -20,27 +18,34 @@
     --green: #19c886;
     --red: #ff5c70;
     --yellow: #ffc857;
-    --shadow: 0 12px 30px rgba(0, 0, 0, .25);
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+html,
+body {
+    width: 100%;
+    min-width: 320px;
+    min-height: 100%;
 }
 
 body {
     min-height: 100vh;
+    padding: 16px;
+    overflow-x: hidden;
+    color: var(--text);
     background:
         radial-gradient(
             circle at top right,
             rgba(39, 213, 245, .10),
-            transparent 30%
+            transparent 32%
         ),
         linear-gradient(135deg, #08111f, #0b1729);
-    color: var(--text);
-    padding: 18px;
 }
 
 button,
@@ -54,60 +59,75 @@ button {
 }
 
 .app-shell {
-    width: min(1600px, 100%);
-    margin: auto;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
 .topbar {
+    width: 100%;
+    min-height: 48px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 4px 2px 16px;
-    border-bottom: 1px solid rgba(80, 120, 170, .24);
-    margin-bottom: 16px;
+    padding: 4px 2px 14px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid rgba(80, 120, 170, .25);
 }
 
 .brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 11px;
+    min-width: 0;
 }
 
 .brand-mark {
     width: 38px;
     height: 38px;
+    flex: 0 0 38px;
     display: grid;
     place-items: center;
     color: #06101c;
     background: linear-gradient(135deg, var(--cyan), var(--blue));
-    border-radius: 11px;
+    border-radius: 10px;
+    font-size: 1.2rem;
     font-weight: 900;
-    box-shadow: 0 8px 22px rgba(39, 213, 245, .22);
+}
+
+.brand-text {
+    min-width: 0;
 }
 
 .brand h1 {
-    font-size: 1.1rem;
-    letter-spacing: 1.5px;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 1.05rem;
+    letter-spacing: 1.2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .brand p {
     margin-top: 3px;
     color: var(--muted);
-    font-size: .7rem;
+    font-size: .68rem;
 }
 
 .connection-status {
     display: flex;
     align-items: center;
     gap: 7px;
+    flex: 0 0 auto;
     padding: 7px 11px;
     color: var(--green);
     background: rgba(25, 200, 134, .08);
     border: 1px solid rgba(25, 200, 134, .25);
     border-radius: 999px;
-    font-size: .7rem;
+    font-size: .68rem;
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .status-dot {
@@ -120,80 +140,97 @@ button {
 
 .dashboard {
     display: grid;
-    grid-template-columns: 390px minmax(0, 1fr);
-    grid-template-rows: minmax(330px, 1fr) minmax(260px, 1fr);
-    gap: 16px;
-    min-height: calc(100vh - 100px);
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+    grid-template-rows: minmax(320px, 1fr) minmax(240px, 1fr);
+    gap: clamp(10px, 1.2vw, 16px);
+    width: 100%;
+    min-height: calc(100vh - 94px);
 }
 
 .panel {
+    width: 100%;
     min-width: 0;
     min-height: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     background: linear-gradient(
         145deg,
         rgba(20, 34, 56, .98),
         rgba(13, 25, 43, .98)
     );
     border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
+    border-radius: 13px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .25);
 }
 
 .panel-header {
-    min-height: 55px;
+    min-width: 0;
+    min-height: 54px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    padding: 14px 16px;
+    gap: 8px;
+    padding: 13px 15px;
     border-bottom: 1px solid rgba(80, 120, 170, .18);
 }
 
 .panel-title {
+    min-width: 0;
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 8px;
+    overflow: hidden;
     color: var(--text);
-    font-size: .78rem;
+    font-size: .76rem;
     font-weight: 800;
-    letter-spacing: .7px;
+    letter-spacing: .6px;
+    text-overflow: ellipsis;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .panel-title::before {
     content: "";
     width: 4px;
     height: 17px;
+    flex: 0 0 4px;
     background: linear-gradient(var(--cyan), var(--blue));
     border-radius: 5px;
 }
 
+.panel-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
 .panel-body {
     flex: 1;
+    min-width: 0;
     min-height: 0;
-    padding: 16px;
+    padding: 14px;
 }
 
 .badge {
     color: var(--muted);
-    font-size: .68rem;
+    font-size: .66rem;
     font-weight: 700;
     white-space: nowrap;
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
 }
 
 .field {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
+    min-width: 0;
 }
 
 .field.full {
@@ -202,20 +239,21 @@ button {
 
 .field label {
     color: var(--muted);
-    font-size: .67rem;
+    font-size: .64rem;
     font-weight: 800;
-    letter-spacing: .6px;
+    letter-spacing: .5px;
     text-transform: uppercase;
 }
 
 input,
 select {
     width: 100%;
-    min-height: 40px;
-    padding: 9px 11px;
+    min-width: 0;
+    min-height: 39px;
+    padding: 8px 10px;
     color: var(--text);
     background: rgba(7, 17, 31, .72);
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border);
     border-radius: 8px;
     outline: none;
     transition: .2s ease;
@@ -237,8 +275,9 @@ input[type="date"] {
 
 .sku-input-row {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(90px, 1fr);
-    gap: 10px;
+    grid-template-columns: minmax(0, 2fr) minmax(75px, 1fr);
+    gap: 9px;
+    min-width: 0;
 }
 
 .sku-field input {
@@ -253,31 +292,36 @@ input[type="date"] {
 
 .condition-options {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
 }
 
 .condition-option {
+    min-width: 0;
+    min-height: 39px;
     display: flex;
     align-items: center;
-    gap: 9px;
-    min-height: 40px;
-    padding: 8px 10px;
+    gap: 8px;
+    padding: 8px 9px;
     background: rgba(7, 17, 31, .72);
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border);
     border-radius: 8px;
     cursor: pointer;
 }
 
 .condition-option input {
     width: 16px;
+    min-width: 16px;
     min-height: 16px;
     accent-color: var(--green);
 }
 
 .condition-option span {
-    font-size: .72rem;
+    overflow: hidden;
+    font-size: .68rem;
     font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .good-text {
@@ -290,24 +334,25 @@ input[type="date"] {
 
 .form-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 15px;
 }
 
 .btn {
-    min-height: 42px;
+    min-width: 0;
+    min-height: 41px;
+    padding: 8px;
     border: 0;
     border-radius: 8px;
-    font-size: .73rem;
+    font-size: .69rem;
     font-weight: 900;
-    letter-spacing: .3px;
     transition: .2s ease;
 }
 
 .btn:hover {
-    transform: translateY(-1px);
     filter: brightness(1.08);
+    transform: translateY(-1px);
 }
 
 .btn:disabled {
@@ -327,49 +372,55 @@ input[type="date"] {
 }
 
 .btn-refresh {
-    min-height: 30px;
-    padding: 5px 10px;
+    min-height: 29px;
+    padding: 5px 9px;
     color: var(--cyan);
     background: rgba(39, 213, 245, .08);
     border: 1px solid rgba(39, 213, 245, .30);
     border-radius: 7px;
-    font-size: .67rem;
+    font-size: .63rem;
     font-weight: 800;
-}
-
-.info-card {
-    justify-content: center;
 }
 
 .info-content {
     width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .empty-state,
-.loading-state {
-    min-height: 170px;
+.loading-state,
+.error-state {
+    min-height: 150px;
     display: grid;
     place-items: center;
+    padding: 20px;
     color: var(--muted);
     text-align: center;
-    font-size: .78rem;
+    font-size: .76rem;
+}
+
+.error-state {
+    color: var(--red);
+}
+
+.loading-state {
+    display: block;
+    padding-top: 55px;
 }
 
 .loading-state::before {
     content: "";
     width: 24px;
     height: 24px;
-    margin: 0 auto 10px;
     display: block;
+    margin: 0 auto 10px;
     border: 3px solid rgba(39, 213, 245, .2);
     border-top-color: var(--cyan);
     border-radius: 50%;
     animation: spin .8s linear infinite;
-}
-
-.loading-state {
-    display: block;
-    padding-top: 55px;
 }
 
 @keyframes spin {
@@ -378,10 +429,14 @@ input[type="date"] {
     }
 }
 
+.recent-info {
+    width: 100%;
+}
+
 .recent-sku-id {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     color: var(--cyan);
-    font-size: 1.22rem;
+    font-size: 1.1rem;
     font-weight: 900;
     text-align: center;
     word-break: break-all;
@@ -390,10 +445,10 @@ input[type="date"] {
 .detail-row {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
-    padding: 8px 0;
+    gap: 10px;
+    padding: 7px 0;
     border-bottom: 1px solid rgba(80, 120, 170, .16);
-    font-size: .76rem;
+    font-size: .73rem;
 }
 
 .detail-row span:first-child {
@@ -402,61 +457,63 @@ input[type="date"] {
 
 .detail-row strong,
 .detail-row span:last-child {
+    max-width: 65%;
+    overflow: hidden;
     text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .inventory-container,
 .queue-container {
-    min-height: 0;
+    width: 100%;
     height: 100%;
+    min-width: 0;
+    min-height: 0;
     overflow: auto;
     border: 1px solid rgba(80, 120, 170, .16);
-    border-radius: 9px;
+    border-radius: 8px;
 }
 
 .table-scroll {
-    min-width: 100%;
+    width: 100%;
+    min-width: 0;
     overflow-x: auto;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: .74rem;
+    font-size: .72rem;
 }
 
 .lookup-table {
-    min-width: 790px;
+    min-width: 760px;
 }
 
 .queue-table {
-    min-width: 650px;
+    min-width: 630px;
 }
 
 th {
     position: sticky;
     top: 0;
     z-index: 2;
-    padding: 11px 10px;
+    padding: 10px 8px;
     color: var(--muted);
     background: #122137;
-    border-bottom: 1px solid var(--border-light);
-    font-size: .66rem;
+    border-bottom: 1px solid var(--border);
+    font-size: .63rem;
     font-weight: 900;
-    letter-spacing: .3px;
     text-align: left;
     text-transform: uppercase;
     white-space: nowrap;
 }
 
 td {
-    padding: 10px;
+    padding: 9px 8px;
     border-bottom: 1px solid rgba(80, 120, 170, .14);
     white-space: nowrap;
-}
-
-tbody tr {
-    transition: .15s ease;
 }
 
 tbody tr:hover {
@@ -471,8 +528,8 @@ tbody tr:hover {
 }
 
 .sku-name-cell {
-    width: 190px;
-    max-width: 190px;
+    width: 180px;
+    max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -503,40 +560,98 @@ tbody tr:hover {
     line-height: 1;
 }
 
-.error-state {
-    min-height: 170px;
-    display: grid;
-    place-items: center;
-    padding: 20px;
-    color: var(--red);
-    text-align: center;
-    font-size: .78rem;
+@media (max-width: 1200px) and (min-width: 901px) {
+    .dashboard {
+        grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
+    }
+
+    .panel-header,
+    .panel-body {
+        padding-left: 11px;
+        padding-right: 11px;
+    }
+
+    .lookup-table {
+        min-width: 700px;
+    }
 }
 
-@media (max-width: 1050px) {
+@media (max-height: 760px) and (min-width: 901px) {
     body {
-        overflow: auto;
+        padding: 10px;
+    }
+
+    .topbar {
+        min-height: 40px;
+        padding-bottom: 9px;
+        margin-bottom: 9px;
+    }
+
+    .dashboard {
+        min-height: calc(100vh - 70px);
+        grid-template-rows: minmax(280px, 1fr) minmax(210px, 1fr);
+        gap: 10px;
+    }
+
+    .panel-header {
+        min-height: 44px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .panel-body {
+        padding: 10px;
+    }
+
+    input,
+    select {
+        min-height: 34px;
+        padding: 6px 8px;
+    }
+
+    .form-actions {
+        margin-top: 9px;
+    }
+}
+
+@media (max-width: 900px) {
+    body {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .topbar {
+        align-items: flex-start;
+        flex-direction: column;
     }
 
     .dashboard {
         display: flex;
         flex-direction: column;
+        gap: 12px;
         min-height: auto;
     }
 
     .panel {
         min-height: 360px;
     }
+
+    .panel-body {
+        overflow: auto;
+    }
 }
 
 @media (max-width: 560px) {
     body {
-        padding: 10px;
+        padding: 8px;
     }
 
-    .topbar {
-        align-items: flex-start;
-        flex-direction: column;
+    .brand h1 {
+        font-size: .9rem;
+    }
+
+    .connection-status {
+        font-size: .6rem;
     }
 
     .form-grid,
@@ -552,6 +667,10 @@ tbody tr:hover {
     .sku-input-row {
         grid-template-columns: 1fr;
     }
+
+    .panel {
+        min-height: 390px;
+    }
 }
 </style>
 </head>
@@ -564,7 +683,7 @@ tbody tr:hover {
         <div class="brand">
             <div class="brand-mark">M</div>
 
-            <div>
+            <div class="brand-text">
                 <h1>MTL INVENTORY CONTROL</h1>
                 <p>Inbound scanning and inventory monitoring</p>
             </div>
@@ -578,11 +697,17 @@ tbody tr:hover {
 
     <main class="dashboard">
 
-        <!-- INPUT PANEL -->
+        <!-- KHU VỰC 1 -->
         <section class="panel">
+
             <div class="panel-header">
-                <div class="panel-title">Nhập dữ liệu</div>
-                <span class="badge">SCAN MODE</span>
+                <div class="panel-title">
+                    Nhập dữ liệu
+                </div>
+
+                <span class="badge">
+                    SCAN MODE
+                </span>
             </div>
 
             <div class="panel-body">
@@ -636,6 +761,7 @@ tbody tr:hover {
                         </div>
 
                         <div class="field full">
+
                             <div class="sku-input-row">
 
                                 <div class="field sku-field">
@@ -664,6 +790,7 @@ tbody tr:hover {
                                 </div>
 
                             </div>
+
                         </div>
 
                         <div class="field full">
@@ -698,6 +825,7 @@ tbody tr:hover {
                     </div>
 
                     <div class="form-actions">
+
                         <button
                             type="submit"
                             class="btn btn-query">
@@ -710,6 +838,7 @@ tbody tr:hover {
                             id="saveButton">
                             DONE / LƯU SHEET
                         </button>
+
                     </div>
 
                 </form>
@@ -718,14 +847,17 @@ tbody tr:hover {
         </section>
 
 
-        <!-- RECENT SKU PANEL -->
-        <section class="panel info-card">
+        <!-- KHU VỰC 2 -->
+        <section class="panel">
+
             <div class="panel-header">
                 <div class="panel-title">
                     SKU vừa bắn
                 </div>
 
-                <span class="badge">LATEST SCAN</span>
+                <span class="badge">
+                    LATEST SCAN
+                </span>
             </div>
 
             <div class="panel-body info-content">
@@ -738,6 +870,7 @@ tbody tr:hover {
 
                 <div
                     id="recentSkuInfo"
+                    class="recent-info"
                     style="display: none;">
 
                     <div
@@ -795,7 +928,7 @@ tbody tr:hover {
         </section>
 
 
-        <!-- INVENTORY LOOKUP PANEL -->
+        <!-- KHU VỰC 3 -->
         <section class="panel">
 
             <div class="panel-header">
@@ -804,7 +937,8 @@ tbody tr:hover {
                     Inventory Details
                 </div>
 
-                <div class="card-title-right">
+                <div class="panel-header-right">
+
                     <span
                         id="lookupCounter"
                         class="badge">
@@ -817,6 +951,7 @@ tbody tr:hover {
                         class="btn-refresh">
                         ↻ REFRESH
                     </button>
+
                 </div>
 
             </div>
@@ -837,7 +972,7 @@ tbody tr:hover {
         </section>
 
 
-        <!-- QUEUE PANEL -->
+        <!-- KHU VỰC 4 -->
         <section class="panel">
 
             <div class="panel-header">
@@ -861,6 +996,7 @@ tbody tr:hover {
                     <div class="table-scroll">
 
                         <table class="queue-table">
+
                             <thead>
                                 <tr>
                                     <th>SKU ID</th>
@@ -872,6 +1008,7 @@ tbody tr:hover {
                             </thead>
 
                             <tbody id="queueBody"></tbody>
+
                         </table>
 
                     </div>
@@ -886,12 +1023,8 @@ tbody tr:hover {
 
 
 <script>
-/*
- * LINK MỚI
- */
 const GOOGLE_SCRIPT_URL =
 "https://script.google.com/macros/s/AKfycbwIX_xNpRp8lf4NpnCef60mv5baGbBHnKdIggC8NnfghvFeNxKd0kX4OIokfIN3LRqU/exec";
-
 
 let queueList = [];
 const lookupCache = new Map();
@@ -911,7 +1044,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /*
      * Enter lần 1 tại SKU:
-     * Chuyển sang ô Qty.
+     * Chuyển sang ô Qty
      */
     inputSku.addEventListener("keydown", function (event) {
         if (event.key !== "Enter") {
@@ -932,7 +1065,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /*
      * Enter lần 2 tại Qty:
-     * Submit form.
+     * Submit form
      */
     inputQty.addEventListener("keydown", function (event) {
         if (event.key !== "Enter") {
@@ -944,8 +1077,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /*
-     * Submit:
-     * Tra cứu SKU và thêm Queue.
+     * Submit form:
+     * Tra cứu SKU và thêm vào Queue
      */
     scanForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -964,7 +1097,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document
         .getElementById("saveButton")
-        .addEventListener("click", saveQueueToSheet);
+        .addEventListener(
+            "click",
+            saveQueueToSheet
+        );
 
     document
         .getElementById("reloadLookupButton")
@@ -972,7 +1108,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const sku = inputSku.value.trim();
 
             if (sku) {
-                lookupCache.delete(sku.toLowerCase());
+                lookupCache.delete(
+                    sku.toLowerCase()
+                );
             }
 
             lookupSkuInventory();
@@ -1051,10 +1189,12 @@ function addToQueue() {
         document.getElementById("warehouse").value;
 
     const staff =
-        document.getElementById("staff").value.trim() || "N/A";
+        document.getElementById("staff").value.trim() ||
+        "N/A";
 
     const palletNo =
-        document.getElementById("palletNo").value.trim() || "N/A";
+        document.getElementById("palletNo").value.trim() ||
+        "N/A";
 
     const condition = getCondition();
 
@@ -1090,7 +1230,6 @@ function addToQueue() {
 
     inputSku.value = "";
     inputQty.value = 1;
-
     inputSku.focus();
 }
 
@@ -1112,6 +1251,7 @@ function showRecentSku(item) {
         document.getElementById("recentCondition");
 
     conditionElement.textContent = item.condition;
+
     conditionElement.className =
         item.condition === "Damage"
             ? "tag-damage"
@@ -1159,9 +1299,9 @@ function renderQueue() {
                 <td
                     colspan="5"
                     style="
-                        text-align: center;
-                        color: var(--muted);
-                        padding: 30px;">
+                        text-align:center;
+                        color:var(--muted);
+                        padding:30px;">
                     Queue đang trống
                 </td>
             </tr>
@@ -1261,7 +1401,8 @@ function saveQueueToSheet() {
     .then(function (result) {
         if (result.status !== "success") {
             throw new Error(
-                result.message || "Lưu dữ liệu thất bại"
+                result.message ||
+                "Lưu dữ liệu thất bại"
             );
         }
 
@@ -1279,20 +1420,25 @@ function saveQueueToSheet() {
             .style.display = "none";
     })
     .catch(function (error) {
-        alert("Lỗi khi lưu dữ liệu: " + error.message);
+        alert(
+            "Lỗi khi lưu dữ liệu: " +
+            error.message
+        );
     })
     .finally(function () {
         saveButton.disabled = false;
-        saveButton.textContent = "DONE / LƯU SHEET";
+        saveButton.textContent =
+            "DONE / LƯU SHEET";
     });
 }
 
 
 function lookupSkuInventory() {
     const sku =
-        document.getElementById("inputSku")
-        .value
-        .trim();
+        document
+            .getElementById("inputSku")
+            .value
+            .trim();
 
     const resultBox =
         document.getElementById("inventoryBox");
@@ -1313,9 +1459,6 @@ function lookupSkuInventory() {
 
     const cacheKey = sku.toLowerCase();
 
-    /*
-     * Dùng cache nếu SKU đã được tra cứu trước đó.
-     */
     if (lookupCache.has(cacheKey)) {
         const cachedData =
             lookupCache.get(cacheKey);
@@ -1357,7 +1500,8 @@ function lookupSkuInventory() {
     .then(function (result) {
         if (result.status !== "success") {
             throw new Error(
-                result.message || "Không thể tra cứu SKU"
+                result.message ||
+                "Không thể tra cứu SKU"
             );
         }
 
@@ -1400,6 +1544,7 @@ function renderLookupTable(data) {
     let html = `
         <div class="table-scroll">
             <table class="lookup-table">
+
                 <thead>
                     <tr>
                         <th>SKU ID</th>
@@ -1454,7 +1599,8 @@ function renderLookupTable(data) {
 
 
 function formatNumber(value) {
-    return Number(value || 0).toLocaleString("en-US");
+    return Number(value || 0)
+        .toLocaleString("en-US");
 }
 
 
