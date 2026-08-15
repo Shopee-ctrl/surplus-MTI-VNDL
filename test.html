@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTL SYSTEM - Fast Lookup Edition</title>
+    <style>
+        :root {
+            --bg: #0b1120;
+            --card: #151e2e;
+            --input: #1c2a40;
+            --border: #2b405c;
+            --cyan: #00d2ff;
+            --gray: #6b83a6;
+            --green: #10b981;
+            --red: #ef4444;
+            --yellow: #fbbf24;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background: var(--bg); color: var(--white); padding: 8px; height: 100vh; overflow: hidden; font-size: 12px; }
+        .page-title { height: 23px; color: var(--cyan); font-size: 18px; font-weight: bold; }
+        .help { position: absolute; top: 8px; right: 12px; color: var(--gray); font-size: 11px; }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            grid-template-rows: 420px 1fr;
+            gap: 10px;
+            height: calc(100vh - 31px);
+        }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 5px; padding: 10px; min-height: 0; display: flex; flex-direction: column; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; color: var(--cyan); font-size: 12px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; }
+        .header-right { display: flex; align-items: center; gap: 10px; color: var(--gray); font-size: 10px; }
+
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        label { color: var(--gray); font-size: 10px; font-weight: bold; }
+
+        input[type="text"], input[type="date"], input[type="number"], select {
+            width: 100%; height: 32px; background: var(--input); color: var(--white); border: 1px solid var(--border); border-radius: 4px; padding: 0 9px; outline: none; font-size: 12px;
+        }
+        input:focus, select:focus { border-color: var(--cyan); box-shadow: 0 0 4px rgba(0, 210, 255, .5); }
+
+        .condition-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+        .condition-item { height: 30px; display: flex; align-items: center; gap: 5px; padding: 0 7px; background: var(--input); border-radius: 3px; cursor: pointer; font-size: 10px; font-weight: bold; white-space: nowrap; }
+        .condition-item input { accent-color: var(--cyan); }
+        .condition-item.good { color: #00d084; }
+        .condition-item.damage { color: #ff4545; }
+        .condition-item.wrong { color: var(--yellow); }
+
+        #correctSkuBox input { border-color: var(--yellow); }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: auto; }
+        .btn-action { height: 32px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .btn-action:disabled { opacity: .6; cursor: wait; }
+        .btn-query { background: var(--cyan); color: #001018; }
+        .btn-done { background: var(--green); color: #fff; }
+        .btn-reload { background: #1f2937; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 3px 7px; cursor: pointer; font-size: 10px; }
+
+        .placeholder-box { flex: 1; min-height: 0; border: 1px dashed var(--border); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--gray); text-align: center; font-style: italic; }
+        .inventory-content { width: 100%; height: 100%; padding: 8px; overflow: auto; text-align: left; font-style: normal; }
+        .inventory-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 11px; }
+        .inventory-table th, .inventory-table td { padding: 6px; border: 1px solid var(--border); text-align: left; vertical-align: top; word-break: break-word; overflow-wrap: anywhere; }
+        .inventory-table th { background: #1c2a40; color: var(--gray); white-space: nowrap; }
+        
+        .inventory-table th:nth-child(1), .inventory-table td:nth-child(1) { width: 17%; }
+        .inventory-table th:nth-child(2), .inventory-table td:nth-child(2) { width: 43%; }
+        .inventory-table th:nth-child(3), .inventory-table td:nth-child(3) { width: 12%; text-align: center; }
+        .inventory-table th:nth-child(4), .inventory-table td:nth-child(4) { width: 28%; }
+
+        .table-container { flex: 1; overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { position: sticky; top: 0; background: #1c2a40; color: var(--gray); padding: 8px; text-align: left; white-space: nowrap; }
+        td { padding: 8px; border-bottom: 1px solid #203047; color: #d1d5db; }
+        .btn-delete { background: var(--red); color: #fff; border: none; border-radius: 3px; padding: 4px 7px; cursor: pointer; font-size: 10px; }
+
+        @media (max-width: 900px) {
+            body { height: auto; overflow: auto; }
+            .dashboard { display: flex; flex-direction: column; height: auto; }
+            .card { min-height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-title">MTL SYSTEM</div>
+<div class="help">? HELP</div>
+
+<div class="dashboard">
+
+    <!-- KHUNG 1 -->
+    <div class="card">
+        <div class="card-header">1. NHẬP DỮ LIỆU</div>
+
+        <div class="form-row-2">
+            <div class="form-group">
+                <label>INBOUND DATE</label>
+                <input type="date" id="inboundDate">
+            </div>
+            <div class="form-group">
+                <label>WAREHOUSE (KHO)</label>
+                <select id="warehouse">
+                    <option value="VNA">VNA</option>
+                    <option value="VNNL">VNNL</option>
+                    <option value="VNVL">VNVL</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row-2">
+            <div class="form-group">
+                <label>STAFF (NGƯỜI NHẬP)</label>
+                <input type="text" id="staff" placeholder="Nhập tên...">
+            </div>
+            <div class="form-group">
+                <label>PALLET NO.</label>
+                <input type="text" id="pallet" placeholder="Số Pallet...">
+            </div>
+        </div>
+
+        <div class="form-row-2">
+            <div class="form-group">
+                <label>INPUT SKU ID (BẮN MÃ)</label>
+                <input type="text" id="inputSku" placeholder="Input SKU/UPC...">
+            </div>
+            <div class="form-group">
+                <label>QTY (SỐ LƯỢNG)</label>
+                <input type="number" id="inputQty" value="1" min="1">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>CONDITION</label>
+            <div class="condition-group">
+                <label class="condition-item good">
+                    <input type="radio" name="condition" value="GOOD" checked> GOOD
+                </label>
+                <label class="condition-item damage">
+                    <input type="radio" name="condition" value="DAMAGE"> DAMAGE
+                </label>
+                <label class="condition-item wrong">
+                    <input type="radio" name="condition" value="SAI HÀNG"> SAI HÀNG
+                </label>
+            </div>
+        </div>
+
+        <div id="correctSkuBox" class="form-group" style="display:none; margin-top:8px;">
+            <label style="color:#fbbf24;">SKU ĐÚNG</label>
+            <input type="text" id="correctSku" placeholder="Nhập hoặc quét SKU đúng...">
+        </div>
+
+        <div class="btn-grid">
+            <button class="btn-action btn-query" id="btnAdd">QUERY (ENTER)</button>
+            <button class="btn-action btn-done" id="btnSave">DONE (LƯU SHEET)</button>
+        </div>
+    </div>
+
+    <!-- KHUNG 3 -->
+    <div class="card">
+        <div class="card-header">
+            <span>3. INVENTORY DETAILS</span>
+            <div class="header-right">
+                <span id="locCount">0 LOCATIONS</span>
+                <button class="btn-reload" id="btnResetInventory">↻ TẢI LẠI RAM</button>
+            </div>
+        </div>
+        <div class="placeholder-box" id="inventoryBox">
+            Nhập SKU và nhấn Enter để tra dữ liệu
+        </div>
+    </div>
+
+    <!-- KHUNG 2 -->
+    <div class="card">
+        <div class="card-header">2. THÔNG TIN SKU VỪA BẮN</div>
+        <div class="placeholder-box" id="recentSkuBox">
+            Chưa có thông tin SKU
+        </div>
+    </div>
+
+    <!-- KHUNG 4 -->
+    <div class="card">
+        <div class="card-header">
+            <span>4. QUEUE (DANH SÁCH ĐÃ BẮN)</span>
+            <div class="header-right">
+                <span id="queueCount">0 SKU</span>
+                <button class="btn-reload" id="btnClear">XÓA TẤT CẢ</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>MÃ SKU</th>
+                        <th>TÌNH TRẠNG</th>
+                        <th>KHO / STAFF / PALLET</th>
+                        <th>SKU ĐÚNG</th>
+                        <th>SỐ LƯỢNG</th>
+                        <th>XÓA</th>
+                    </tr>
+                </thead>
+                <tbody id="queueTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center; color:#6b83a6; padding:30px;">
+                            Chưa có SKU trong queue
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // -----------------------------------------------------------------
+    // CẤU HÌNH SERVER
+    // -----------------------------------------------------------------
+const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
+    const GAS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9HW-dlG9YulpQBRvloWxEapAwWFbY0X_Qd-_TQ81OqjD5BUsMqRchDrN8DUM1IXXf/exec";
+    // -----------------------------------------------------------------
+
+    let queue = [];
+
+    const inboundDate = document.getElementById("inboundDate");
+    const warehouse = document.getElementById("warehouse");
+    const staff = document.getElementById("staff");
+    const pallet = document.getElementById("pallet");
+    const inputSku = document.getElementById("inputSku");
+    const inputQty = document.getElementById("inputQty");
+    const correctSkuBox = document.getElementById("correctSkuBox");
+    const correctSku = document.getElementById("correctSku");
+    const inventoryBox = document.getElementById("inventoryBox");
+    const locCount = document.getElementById("locCount");
+    const recentSkuBox = document.getElementById("recentSkuBox");
+    const queueTableBody = document.getElementById("queueTableBody");
+    const queueCount = document.getElementById("queueCount");
+    const btnSave = document.getElementById("btnSave");
+
+    // LƯU TẠM DỮ LIỆU CHỐNG MẤT KHI F5
+    const formFields = ["inboundDate", "warehouse", "staff", "pallet", "inputSku", "inputQty", "correctSku"];
+
+    function saveDraft() {
+        formFields.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) localStorage.setItem("draft_" + id, el.value);
+        });
+        const cond = document.querySelector('input[name="condition"]:checked');
+        if (cond) localStorage.setItem("draft_condition", cond.value);
+        localStorage.setItem("draft_queue", JSON.stringify(queue));
+    }
+
+    function loadDraft() {
+        formFields.forEach(id => {
+            const val = localStorage.getItem("draft_" + id);
+            const el = document.getElementById(id);
+            if (val !== null && el) el.value = val;
+        });
+        const savedCond = localStorage.getItem("draft_condition");
+        if (savedCond) {
+            const radio = document.querySelector(`input[name="condition"][value="${savedCond}"]`);
+            if (radio) {
+                radio.checked = true;
+                if (savedCond === "SAI HÀNG") correctSkuBox.style.display = "flex";
+            }
+        }
+        const savedQueue = localStorage.getItem("draft_queue");
+        if (savedQueue) {
+            try {
+                queue = JSON.parse(savedQueue) || [];
+                renderQueue();
+            } catch(e) {}
+        }
+    }
+
+    formFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener("input", saveDraft);
+    });
+
+    function setToday() {
+        if (!inboundDate.value) {
+            const now = new Date();
+            inboundDate.value = now.getFullYear() + "-" +
+                String(now.getMonth() + 1).padStart(2, "0") + "-" +
+                String(now.getDate()).padStart(2, "0");
+        }
+    }
+
+    staff.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") { e.preventDefault(); pallet.focus(); pallet.select(); }
+    });
+
+    pallet.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") { e.preventDefault(); inputSku.focus(); inputSku.select(); }
+    });
+
+    document.querySelectorAll('input[name="condition"]').forEach(function(radio) {
+        radio.addEventListener("change", function() {
+            if (this.value === "SAI HÀNG") {
+                correctSkuBox.style.display = "flex";
+                correctSku.focus();
+                correctSku.select();
+            } else {
+                correctSkuBox.style.display = "none";
+                correctSku.value = "";
+            }
+            saveDraft();
+        });
+    });
+
+    inputSku.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            lookupSku();
+            inputQty.focus();
+            inputQty.select();
+        }
+    });
+
+    inputQty.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            const condition = document.querySelector('input[name="condition"]:checked').value;
+            if (condition === "SAI HÀNG") {
+                correctSku.focus();
+                correctSku.select();
+            } else {
+                addToQueue();
+            }
+        }
+    });
+
+    correctSku.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") { e.preventDefault(); addToQueue(); }
+    });
+
+    document.getElementById("btnAdd").addEventListener("click", addToQueue);
+
+    async function lookupSku() {
+        const sku = inputSku.value.trim();
+
+        if (!sku) {
+            inventoryBox.innerHTML = "Vui lòng nhập SKU để tra cứu.";
+            locCount.textContent = "0 LOCATIONS";
+            return;
+        }
+
+        inventoryBox.innerHTML = "ĐANG TRA DỮ LIỆU TỪ RAM...";
+        locCount.textContent = "ĐANG TÌM...";
+
+        const url = PYTHON_API_URL + "/lookup?sku=" + encodeURIComponent(sku);
+
+        try {
+            const response = await fetch(url);
+            const result = await response.json();
+
+            if (result.status === "not_found") {
+                inventoryBox.innerHTML = "Không tìm thấy SKU trong ONH.";
+                locCount.textContent = "0 LOCATIONS";
+                return;
+            }
+
+            if (result.status !== "success") {
+                throw new Error(result.message || "Không thể tra cứu SKU.");
+            }
+
+            renderInventoryData(result.data);
+
+        } catch (error) {
+            console.error("Lỗi tra cứu SKU:", error);
+            inventoryBox.innerHTML = "Không thể tra dữ liệu từ Server Python.";
+            locCount.textContent = "0 LOCATIONS";
+        }
+    }
+
+    function renderInventoryData(data) {
+        if (!Array.isArray(data) || data.length === 0) {
+            inventoryBox.innerHTML = "Không có dữ liệu phù hợp.";
+            locCount.textContent = "0 LOCATIONS";
+            return;
+        }
+
+        const rowsHtml = data.map(function(row) {
+            return `
+                <tr>
+                    <td>${escapeHtml(row[0] || "")}</td>
+                    <td>${escapeHtml(row[1] || "")}</td>
+                    <td>${escapeHtml(row[2] || "")}</td>
+                    <td>${escapeHtml(row[3] || "")}</td>
+                </tr>
+            `;
+        }).join("");
+
+        inventoryBox.innerHTML = `
+            <div class="inventory-content">
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>SKU NAME</th>
+                            <th>QTY</th>
+                            <th>LOCATION</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+            </div>
+        `;
+
+        locCount.textContent = data.length + " LOCATIONS";
+    }
+
+    function addToQueue() {
+        const skuValue = inputSku.value.trim();
+        const qtyValue = parseInt(inputQty.value, 10) || 0;
+        const staffValue = staff.value.trim();
+        const palletValue = pallet.value.trim();
+        const conditionValue = document.querySelector('input[name="condition"]:checked').value;
+        const correctSkuValue = correctSku.value.trim();
+
+        if (!skuValue) { alert("Vui lòng nhập SKU!"); inputSku.focus(); return; }
+        if (qtyValue <= 0) { alert("Qty phải lớn hơn 0!"); inputQty.focus(); return; }
+        if (conditionValue === "SAI HÀNG" && !correctSkuValue) {
+            alert("Vui lòng nhập SKU đúng!"); correctSku.focus(); return;
+        }
+
+        const item = {
+            date: inboundDate.value,
+            warehouse: warehouse.value,
+            sku: skuValue,
+            qty: qtyValue,
+            note: conditionValue,
+            pallet: palletValue,
+            staff: staffValue || "N/A",
+            time: new Date().toLocaleTimeString("vi-VN"),
+            correctSku: conditionValue === "SAI HÀNG" ? correctSkuValue : ""
+        };
+
+        queue.push(item);
+
+        recentSkuBox.innerHTML = `
+            <div style="text-align:left; width:100%; padding:10px;">
+                <p><b>SKU:</b> ${escapeHtml(item.sku)}</p>
+                <p><b>SKU đúng:</b> ${escapeHtml(item.correctSku || "-")}</p>
+                <p><b>QTY:</b> ${item.qty}</p>
+                <p><b>Condition:</b> ${escapeHtml(item.note)}</p>
+                <p><b>Warehouse:</b> ${escapeHtml(item.warehouse)}</p>
+                <p><b>Staff:</b> ${escapeHtml(item.staff)}</p>
+                <p><b>Pallet:</b> ${escapeHtml(item.pallet || "-")}</p>
+            </div>
+        `;
+
+        renderQueue();
+
+        inputSku.value = "";
+        inputQty.value = "1";
+        correctSku.value = "";
+        correctSkuBox.style.display = "none";
+        document.querySelector('input[name="condition"][value="GOOD"]').checked = true;
+
+        saveDraft();
+        inputSku.focus();
+    }
+
+    function renderQueue() {
+        queueCount.textContent = queue.length + " SKU";
+
+        if (queue.length === 0) {
+            queueTableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center; color:#6b83a6; padding:30px;">
+                        Chưa có SKU trong queue
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        queueTableBody.innerHTML = queue.map(function(item, index) {
+            return `
+                <tr>
+                    <td style="color:#00d2ff; font-weight:bold;">${escapeHtml(item.sku)}</td>
+                    <td>${escapeHtml(item.note)}</td>
+                    <td>${escapeHtml(item.warehouse)} / ${escapeHtml(item.staff)} / ${escapeHtml(item.pallet || "-")}</td>
+                    <td>${escapeHtml(item.correctSku || "-")}</td>
+                    <td>${item.qty}</td>
+                    <td style="text-align:center;">
+                        <button class="btn-delete" onclick="removeItem(${index})">Xóa</button>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    }
+
+    function removeItem(index) {
+        queue.splice(index, 1);
+        renderQueue();
+        saveDraft();
+    }
+    window.removeItem = removeItem;
+
+    document.getElementById("btnClear").addEventListener("click", function() {
+        if (queue.length === 0) return;
+        if (confirm("Xóa tất cả dữ liệu tạm?")) {
+            queue = [];
+            renderQueue();
+            recentSkuBox.innerHTML = "Chưa có thông tin SKU";
+            localStorage.removeItem("draft_queue");
+            inputSku.focus();
+        }
+    });
+
+    document.getElementById("btnResetInventory").addEventListener("click", async function() {
+        inventoryBox.innerHTML = "ĐANG LÀM MỚI RAM...";
+        try {
+            await fetch(PYTHON_API_URL + "/reload");
+            alert("Đã cập nhật RAM thành công!");
+            lookupSku();
+        } catch(e) {
+            alert("Lỗi khi kết nối Python Server.");
+        }
+    });
+
+    btnSave.addEventListener("click", saveToSheet);
+
+    // KỸ THUẬT LƯU BẰNG FORM ẨN - BYPASS HOÀN TOÀN LỖI CORS CỦA GOOGLE
+    async function saveToSheet() {
+        if (queue.length === 0) {
+            alert("Queue đang trống!");
+            return;
+        }
+
+        const oldText = btnSave.textContent;
+        btnSave.disabled = true;
+        btnSave.textContent = "ĐANG LƯU...";
+
+        try {
+            const iframeName = "hidden_iframe_" + Date.now();
+            const iframe = document.createElement("iframe");
+            iframe.name = iframeName;
+            iframe.style.display = "none";
+            document.body.appendChild(iframe);
+
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = GAS_SCRIPT_URL;
+            form.target = iframeName;
+
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "postData";
+            input.value = JSON.stringify({ items: queue });
+            form.appendChild(input);
+
+            document.body.appendChild(form);
+            form.submit();
+
+            setTimeout(() => {
+                alert("Đã lưu thành công " + queue.length + " SKU vào đúng Sheet!");
+                queue = [];
+                renderQueue();
+                recentSkuBox.innerHTML = "Chưa có thông tin SKU";
+                localStorage.removeItem("draft_queue");
+                inputSku.focus();
+                
+                document.body.removeChild(form);
+                document.body.removeChild(iframe);
+                btnSave.disabled = false;
+                btnSave.textContent = oldText;
+            }, 1500);
+
+        } catch (error) {
+            console.error("Lỗi gửi dữ liệu:", error);
+            alert("Không thể gửi dữ liệu: " + error.message);
+            btnSave.disabled = false;
+            btnSave.textContent = oldText;
+        }
+    }
+
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    loadDraft();
+    setToday();
+    inputSku.focus();
+</script>
+
+</body>
+</html>
