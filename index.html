@@ -26,7 +26,7 @@
         .dashboard {
             display: grid;
             grid-template-columns: 380px 1fr;
-            grid-template-rows: 420px 1fr;
+            grid-template-rows: 480px 1fr;
             gap: 10px;
             height: calc(100vh - 31px);
         }
@@ -36,7 +36,7 @@
         .header-right { display: flex; align-items: center; gap: 10px; color: var(--gray); font-size: 10px; }
 
         .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
         label { color: var(--gray); font-size: 10px; font-weight: bold; }
 
         input[type="text"], input[type="date"], input[type="number"], select {
@@ -120,6 +120,11 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <label>PACKAGE CODE (MÃ KIỆN)</label>
+            <input type="text" id="packageCode" placeholder="Mã kiện (Ghi Cột K)...">
+        </div>
+
         <div class="form-row-2">
             <div class="form-group">
                 <label>INPUT SKU ID (BẮN MÃ)</label>
@@ -146,7 +151,7 @@
             </div>
         </div>
 
-        <div id="correctSkuBox" class="form-group" style="display:none; margin-top:8px;">
+        <div id="correctSkuBox" class="form-group" style="display:none;">
             <label style="color:#fbbf24;">SKU ĐÚNG</label>
             <input type="text" id="correctSku" placeholder="Nhập hoặc quét SKU đúng...">
         </div>
@@ -194,6 +199,7 @@
                 <thead>
                     <tr>
                         <th>MÃ SKU</th>
+                        <th>MÃ KIỆN</th>
                         <th>TÌNH TRẠNG</th>
                         <th>KHO / STAFF / PALLET</th>
                         <th>SKU ĐÚNG</th>
@@ -203,7 +209,7 @@
                 </thead>
                 <tbody id="queueTableBody">
                     <tr>
-                        <td colspan="6" style="text-align:center; color:#6b83a6; padding:30px;">
+                        <td colspan="7" style="text-align:center; color:#6b83a6; padding:30px;">
                             Chưa có SKU trong queue
                         </td>
                     </tr>
@@ -215,12 +221,8 @@
 </div>
 
 <script>
-    // -----------------------------------------------------------------
-    // CẤU HÌNH SERVER
-    // -----------------------------------------------------------------
-const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
-    const GAS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9HW-dlG9YulpQBRvloWxEapAwWFbY0X_Qd-_TQ81OqjD5BUsMqRchDrN8DUM1IXXf/exec";
-    // -----------------------------------------------------------------
+    const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
+    const GAS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhMoKJtFr70dQCzt9f63fGTO977ZjLoM1hRQx5fWkAB6aitbmkqcf_1dkxe5gLKNbE/exec";
 
     let queue = [];
 
@@ -228,6 +230,7 @@ const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
     const warehouse = document.getElementById("warehouse");
     const staff = document.getElementById("staff");
     const pallet = document.getElementById("pallet");
+    const packageCode = document.getElementById("packageCode");
     const inputSku = document.getElementById("inputSku");
     const inputQty = document.getElementById("inputQty");
     const correctSkuBox = document.getElementById("correctSkuBox");
@@ -239,8 +242,7 @@ const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
     const queueCount = document.getElementById("queueCount");
     const btnSave = document.getElementById("btnSave");
 
-    // LƯU TẠM DỮ LIỆU CHỐNG MẤT KHI F5
-    const formFields = ["inboundDate", "warehouse", "staff", "pallet", "inputSku", "inputQty", "correctSku"];
+    const formFields = ["inboundDate", "warehouse", "staff", "pallet", "packageCode", "inputSku", "inputQty", "correctSku"];
 
     function saveDraft() {
         formFields.forEach(id => {
@@ -294,6 +296,10 @@ const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
     });
 
     pallet.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") { e.preventDefault(); packageCode.focus(); packageCode.select(); }
+    });
+
+    packageCode.addEventListener("keydown", function(e) {
         if (e.key === "Enter") { e.preventDefault(); inputSku.focus(); inputSku.select(); }
     });
 
@@ -418,6 +424,7 @@ const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
         const qtyValue = parseInt(inputQty.value, 10) || 0;
         const staffValue = staff.value.trim();
         const palletValue = pallet.value.trim();
+        const packageCodeValue = packageCode.value.trim();
         const conditionValue = document.querySelector('input[name="condition"]:checked').value;
         const correctSkuValue = correctSku.value.trim();
 
@@ -434,6 +441,7 @@ const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
             qty: qtyValue,
             note: conditionValue,
             pallet: palletValue,
+            packageCode: packageCodeValue,
             staff: staffValue || "N/A",
             time: new Date().toLocaleTimeString("vi-VN"),
             correctSku: conditionValue === "SAI HÀNG" ? correctSkuValue : ""
@@ -444,6 +452,7 @@ const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
         recentSkuBox.innerHTML = `
             <div style="text-align:left; width:100%; padding:10px;">
                 <p><b>SKU:</b> ${escapeHtml(item.sku)}</p>
+                <p><b>Mã kiện:</b> ${escapeHtml(item.packageCode || "-")}</p>
                 <p><b>SKU đúng:</b> ${escapeHtml(item.correctSku || "-")}</p>
                 <p><b>QTY:</b> ${item.qty}</p>
                 <p><b>Condition:</b> ${escapeHtml(item.note)}</p>
@@ -471,7 +480,7 @@ const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
         if (queue.length === 0) {
             queueTableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" style="text-align:center; color:#6b83a6; padding:30px;">
+                    <td colspan="7" style="text-align:center; color:#6b83a6; padding:30px;">
                         Chưa có SKU trong queue
                     </td>
                 </tr>
@@ -483,6 +492,7 @@ const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
             return `
                 <tr>
                     <td style="color:#00d2ff; font-weight:bold;">${escapeHtml(item.sku)}</td>
+                    <td>${escapeHtml(item.packageCode || "-")}</td>
                     <td>${escapeHtml(item.note)}</td>
                     <td>${escapeHtml(item.warehouse)} / ${escapeHtml(item.staff)} / ${escapeHtml(item.pallet || "-")}</td>
                     <td>${escapeHtml(item.correctSku || "-")}</td>
@@ -526,7 +536,6 @@ const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
 
     btnSave.addEventListener("click", saveToSheet);
 
-    // KỸ THUẬT LƯU BẰNG FORM ẨN - BYPASS HOÀN TOÀN LỖI CORS CỦA GOOGLE
     async function saveToSheet() {
         if (queue.length === 0) {
             alert("Queue đang trống!");
@@ -538,43 +547,28 @@ const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
         btnSave.textContent = "ĐANG LƯU...";
 
         try {
-            const iframeName = "hidden_iframe_" + Date.now();
-            const iframe = document.createElement("iframe");
-            iframe.name = iframeName;
-            iframe.style.display = "none";
-            document.body.appendChild(iframe);
+            const payload = JSON.stringify({ items: queue });
 
-            const form = document.createElement("form");
-            form.method = "POST";
-            form.action = GAS_SCRIPT_URL;
-            form.target = iframeName;
+            await fetch(GAS_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "text/plain"
+                },
+                body: payload
+            });
 
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = "postData";
-            input.value = JSON.stringify({ items: queue });
-            form.appendChild(input);
-
-            document.body.appendChild(form);
-            form.submit();
-
-            setTimeout(() => {
-                alert("Đã lưu thành công " + queue.length + " SKU vào đúng Sheet!");
-                queue = [];
-                renderQueue();
-                recentSkuBox.innerHTML = "Chưa có thông tin SKU";
-                localStorage.removeItem("draft_queue");
-                inputSku.focus();
-                
-                document.body.removeChild(form);
-                document.body.removeChild(iframe);
-                btnSave.disabled = false;
-                btnSave.textContent = oldText;
-            }, 1500);
+            alert("Đã gửi thành công " + queue.length + " SKU vào Google Sheet!");
+            queue = [];
+            renderQueue();
+            recentSkuBox.innerHTML = "Chưa có thông tin SKU";
+            localStorage.removeItem("draft_queue");
+            inputSku.focus();
 
         } catch (error) {
             console.error("Lỗi gửi dữ liệu:", error);
             alert("Không thể gửi dữ liệu: " + error.message);
+        } finally {
             btnSave.disabled = false;
             btnSave.textContent = oldText;
         }
