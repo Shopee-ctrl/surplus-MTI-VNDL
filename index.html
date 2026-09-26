@@ -105,6 +105,7 @@
                     <option value="VNA">VNA</option>
                     <option value="VNNL">VNNL</option>
                     <option value="VNVL">VNVL</option>
+                    <option value="VNDL">VNDL</option>
                 </select>
             </div>
         </div>
@@ -115,14 +116,14 @@
                 <input type="text" id="staff" placeholder="Nhập tên...">
             </div>
             <div class="form-group">
-                <label>PALLET NO.</label>
-                <input type="text" id="pallet" placeholder="Số Pallet...">
+                <label>SHIPPING ID</label>
+                <input type="text" id="shippingId" placeholder="Nhập Shipping ID...">
             </div>
         </div>
 
         <div class="form-group">
-            <label>PACKAGE CODE (MÃ KIỆN)</label>
-            <input type="text" id="packageCode" placeholder="Mã kiện (Ghi Cột K)...">
+            <label>MTB</label>
+            <input type="text" id="mtb" placeholder="Nhập MTB...">
         </div>
 
         <div class="form-row-2">
@@ -199,9 +200,9 @@
                 <thead>
                     <tr>
                         <th>MÃ SKU</th>
-                        <th>MÃ KIỆN</th>
+                        <th>MTB</th>
                         <th>TÌNH TRẠNG</th>
-                        <th>KHO / STAFF / PALLET</th>
+                        <th>KHO / STAFF / SHIPPING ID</th>
                         <th>SKU ĐÚNG</th>
                         <th>SỐ LƯỢNG</th>
                         <th>XÓA</th>
@@ -222,15 +223,15 @@
 
 <script>
     const PYTHON_API_URL = "https://checkdata-fhto.onrender.com";
-    const GAS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhMoKJtFr70dQCzt9f63fGTO977ZjLoM1hRQx5fWkAB6aitbmkqcf_1dkxe5gLKNbE/exec";
+    const GAS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwoEwxwd09s4eGf8keSdZVr28iW3PEOfUwHJIVapdGtNEe6LrN6j6usM3w7YlI1qkEf/exec";
 
     let queue = [];
 
     const inboundDate = document.getElementById("inboundDate");
     const warehouse = document.getElementById("warehouse");
     const staff = document.getElementById("staff");
-    const pallet = document.getElementById("pallet");
-    const packageCode = document.getElementById("packageCode");
+    const shippingId = document.getElementById("shippingId");
+    const mtb = document.getElementById("mtb");
     const inputSku = document.getElementById("inputSku");
     const inputQty = document.getElementById("inputQty");
     const correctSkuBox = document.getElementById("correctSkuBox");
@@ -242,7 +243,7 @@
     const queueCount = document.getElementById("queueCount");
     const btnSave = document.getElementById("btnSave");
 
-    const formFields = ["inboundDate", "warehouse", "staff", "pallet", "packageCode", "inputSku", "inputQty", "correctSku"];
+    const formFields = ["inboundDate", "warehouse", "staff", "shippingId", "mtb", "inputSku", "inputQty", "correctSku"];
 
     function saveDraft() {
         formFields.forEach(id => {
@@ -292,14 +293,14 @@
     }
 
     staff.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") { e.preventDefault(); pallet.focus(); pallet.select(); }
+        if (e.key === "Enter") { e.preventDefault(); shippingId.focus(); shippingId.select(); }
     });
 
-    pallet.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") { e.preventDefault(); packageCode.focus(); packageCode.select(); }
+    shippingId.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") { e.preventDefault(); mtb.focus(); mtb.select(); }
     });
 
-    packageCode.addEventListener("keydown", function(e) {
+    mtb.addEventListener("keydown", function(e) {
         if (e.key === "Enter") { e.preventDefault(); inputSku.focus(); inputSku.select(); }
     });
 
@@ -423,8 +424,8 @@
         const skuValue = inputSku.value.trim();
         const qtyValue = parseInt(inputQty.value, 10) || 0;
         const staffValue = staff.value.trim();
-        const palletValue = pallet.value.trim();
-        const packageCodeValue = packageCode.value.trim();
+        const shippingIdValue = shippingId.value.trim();
+        const mtbValue = mtb.value.trim();
         const conditionValue = document.querySelector('input[name="condition"]:checked').value;
         const correctSkuValue = correctSku.value.trim();
 
@@ -440,11 +441,13 @@
             sku: skuValue,
             qty: qtyValue,
             note: conditionValue,
-            pallet: palletValue,
-            packageCode: packageCodeValue,
+            shippingId: shippingIdValue,
+            mtb: mtbValue,
             staff: staffValue || "N/A",
             time: new Date().toLocaleTimeString("vi-VN"),
-            correctSku: conditionValue === "SAI HÀNG" ? correctSkuValue : ""
+            correctSku: conditionValue === "SAI HÀNG" ? correctSkuValue : "",
+            pallet: shippingIdValue,
+            packageCode: mtbValue
         };
 
         queue.push(item);
@@ -452,13 +455,13 @@
         recentSkuBox.innerHTML = `
             <div style="text-align:left; width:100%; padding:10px;">
                 <p><b>SKU:</b> ${escapeHtml(item.sku)}</p>
-                <p><b>Mã kiện:</b> ${escapeHtml(item.packageCode || "-")}</p>
+                <p><b>MTB:</b> ${escapeHtml(item.mtb || "-")}</p>
                 <p><b>SKU đúng:</b> ${escapeHtml(item.correctSku || "-")}</p>
                 <p><b>QTY:</b> ${item.qty}</p>
                 <p><b>Condition:</b> ${escapeHtml(item.note)}</p>
                 <p><b>Warehouse:</b> ${escapeHtml(item.warehouse)}</p>
                 <p><b>Staff:</b> ${escapeHtml(item.staff)}</p>
-                <p><b>Pallet:</b> ${escapeHtml(item.pallet || "-")}</p>
+                <p><b>Shipping ID:</b> ${escapeHtml(item.shippingId || "-")}</p>
             </div>
         `;
 
@@ -492,9 +495,9 @@
             return `
                 <tr>
                     <td style="color:#00d2ff; font-weight:bold;">${escapeHtml(item.sku)}</td>
-                    <td>${escapeHtml(item.packageCode || "-")}</td>
+                    <td>${escapeHtml(item.mtb || "-")}</td>
                     <td>${escapeHtml(item.note)}</td>
-                    <td>${escapeHtml(item.warehouse)} / ${escapeHtml(item.staff)} / ${escapeHtml(item.pallet || "-")}</td>
+                    <td>${escapeHtml(item.warehouse)} / ${escapeHtml(item.staff)} / ${escapeHtml(item.shippingId || "-")}</td>
                     <td>${escapeHtml(item.correctSku || "-")}</td>
                     <td>${item.qty}</td>
                     <td style="text-align:center;">
